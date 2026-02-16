@@ -1,0 +1,78 @@
+name: Build AOC Docker Images
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ '*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+
+  # ── Level 0: no dependencies ──────────────────────────────────────────────
+
+  ros-humble:
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image:    ros:humble
+      push_image:    ros
+      ros_distro:    humble
+      dockerfile:    base.dockerfile
+      architectures: linux/amd64,linux/arm64
+    secrets: inherit
+
+  ros-jazzy:
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image:    ros:jazzy
+      push_image:    ros
+      ros_distro:    jazzy
+      dockerfile:    base.dockerfile
+      architectures: linux/amd64,linux/arm64
+    secrets: inherit
+
+  ros-cuda-humble:
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image:    nvidia/cuda:11.8.0-runtime-ubuntu22.04
+      push_image:    ros_cuda
+      ros_distro:      humble
+      dockerfile:    cuda.dockerfile
+      architectures: linux/amd64
+    secrets: inherit
+
+  ros-cuda-jazzy:
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image:    nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
+      push_image:    ros_cuda
+      ros_distro:    jazzy
+      dockerfile:    cuda.dockerfile
+      architectures: linux/amd64
+    secrets: inherit
+
+  # ── Level 1: base_image is the exact digest from level 0 ─────────────────
+
+  ros-cuda-desktop-humble:
+    needs: ros-cuda-humble
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      # Digest is immutable — no staging tag, no race condition, no cleanup
+      base_image:    lcas.lincoln.ac.uk/ros_cuda@${{ needs.ros-cuda-humble.outputs.digest }}
+      push_image:    ros_cuda_desktop
+      ros_distro:      humble
+      dockerfile:    cuda_desktop.dockerfile
+      architectures: linux/amd64
+    secrets: inherit
+
+  ros-cuda-desktop-jazzy:
+    needs: ros-cuda-jazzy
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image:    lcas.lincoln.ac.uk/ros_cuda@${{ needs.ros-cuda-jazzy.outputs.digest }}
+      push_image:    ros_cuda_desktop
+      ros_distro:      jazzy
+      dockerfile:    cuda_desktop.dockerfile
+      architectures: linux/amd64
+    secrets: inherit
