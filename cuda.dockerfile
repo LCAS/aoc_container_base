@@ -1,7 +1,12 @@
 ARG BASE_IMAGE=nvidia/cuda:11.8.0-runtime-ubuntu22.04
+ARG ROS_DISTRO=humble
+
 
 ###########################################
 FROM ${BASE_IMAGE} AS base
+ 
+ENV BASE_IMAGE=${BASE_IMAGE}
+ENV ROS_DISTRO=${ROS_DISTRO}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
