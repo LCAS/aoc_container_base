@@ -3,101 +3,76 @@ name: Build AOC Docker Images
 on:
   push:
     branches: [ main ]
-    tags:
-      - '*'
+    tags: [ '*' ]
   pull_request:
     branches: [ main ]
-
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: 
-      - lcas
-      - qemu
-    strategy:
-        fail-fast: true
-        # make sure we build them sequentially to maximise cache hits
-        max-parallel: 1
-        matrix:
-          include:
-            # humble
-            - base_image: ros:humble
-              push_image: ros
-              ros_dist: humble
-              dockerfile: base.dockerfile
-              architectures: linux/amd64,linux/arm64
 
-            - base_image: nvidia/cuda:11.8.0-runtime-ubuntu22.04
-              push_image: ros_cuda
-              ros_dist: humble
-              dockerfile: cuda.dockerfile
-              architectures: linux/amd64
+  # ── Level 0: no dependencies ──────────────────────────────────────────────
 
-            # jazzy
-            - base_image: ros:jazzy
-              push_image: ros
-              ros_dist: jazzy
-              dockerfile: base.dockerfile
-              architectures: linux/amd64,linux/arm64
+  ros-humble:
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image:    ros:humble
+      push_image:    ros
+      ros_dist:      humble
+      dockerfile:    base.dockerfile
+      architectures: linux/amd64,linux/arm64
+    secrets: inherit
 
-            - base_image: nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
-              push_image: ros_cuda
-              ros_dist: jazzy
-              dockerfile: cuda.dockerfile
-              architectures: linux/amd64
-              
-    steps:
-    - name: Node Js
-      uses: actions/setup-node@v4
-    - uses: actions/checkout@v3
-    - name: What
-      run: echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
-    - name: Docker Login LCAS
-      uses: docker/login-action@v3
-      with:
-        # Server address of Docker registry. If not set then will default to Docker Hub
-        registry: lcas.lincoln.ac.uk
-        # Username used to log against the Docker registry
-        username: ${{ secrets.LCAS_REGISTRY_PUSHER }}
-        # Password or personal access token used to log against the Docker registry
-        password: ${{ secrets.LCAS_REGISTRY_TOKEN }}
+  ros-jazzy:
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image:    ros:jazzy
+      push_image:    ros
+      ros_dist:      jazzy
+      dockerfile:    base.dockerfile
+      architectures: linux/amd64,linux/arm64
+    secrets: inherit
 
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        flavor: |
-          latest=false
-        labels: |
-          org.opencontainers.image.description=AOC Docker Image (flavour: ${{ matrix.push_image }}, ${{ matrix.ros_dist }}, ${{ matrix.architectures }})
-          org.opencontainers.image.authors=L-CAS Team
-        # list of Docker images to use as base name for tags
-        images: |
-          lcas.lincoln.ac.uk/${{ matrix.push_image }}
-        # generate Docker tags based on the following events/attributes
-        tags: |
-          type=raw,value=${{ matrix.ros_dist }}-staging
-          type=raw,enable=${{ github.event_name != 'pull_request' }},value=${{ matrix.ros_dist }}-latest
-          type=ref,enable=${{ github.event_name != 'pull_request' }},event=branch,prefix=${{ matrix.ros_dist }}-
-          type=semver,pattern={{version}},prefix=${{ matrix.ros_dist }}-
-          type=semver,pattern={{major}}.{{minor}},prefix=${{ matrix.ros_dist }}-
-          type=semver,pattern={{major}},prefix=${{ matrix.ros_dist }}-
+  ros-cuda-humble:
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image:    nvidia/cuda:11.8.0-runtime-ubuntu22.04
+      push_image:    ros_cuda
+      ros_dist:      humble
+      dockerfile:    cuda.dockerfile
+      architectures: linux/amd64
+    secrets: inherit
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      
-    - name: Build Docker Image
-      uses: docker/build-push-action@v6
-      with:
-        context: ./docker
-        file: ./${{ matrix.dockerfile }}
-        platforms: ${{ matrix.architectures }}
-        push: true
-        cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ matrix.push_image }}:${{ matrix.ros_dist }}
-        cache-to: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ matrix.push_image }}:${{ matrix.ros_dist }},mode=max
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        build-args: |
-            BASE_IMAGE=${{ matrix.base_image }}
-            ROS_DISTRO=${{ matrix.ros_dist }}
+  ros-cuda-jazzy:
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image:    nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
+      push_image:    ros_cuda
+      ros_dist:      jazzy
+      dockerfile:    cuda.dockerfile
+      architectures: linux/amd64
+    secrets: inherit
+
+  # ── Level 1: base_image is the exact digest from level 0 ─────────────────
+
+  ros-cuda-desktop-humble:
+    needs: ros-cuda-humble
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      # Digest is immutable — no staging tag, no race condition, no cleanup
+      base_image:    lcas.lincoln.ac.uk/ros_cuda@${{ needs.ros-cuda-humble.outputs.digest }}
+      push_image:    ros_cuda_desktop
+      ros_dist:      humble
+      dockerfile:    cuda_desktop.dockerfile
+      architectures: linux/amd64
+    secrets: inherit
+
+  ros-cuda-desktop-jazzy:
+    needs: ros-cuda-jazzy
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image:    lcas.lincoln.ac.uk/ros_cuda@${{ needs.ros-cuda-jazzy.outputs.digest }}
+      push_image:    ros_cuda_desktop
+      ros_dist:      jazzy
+      dockerfile:    cuda_desktop.dockerfile
+      architectures: linux/amd64
+    secrets: inherit
