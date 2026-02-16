@@ -44,7 +44,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-rosdep \
     && rm -rf /var/lib/apt/lists/*
 
-RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep update
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
 
 FROM base AS desktop
 RUN apt-get update && apt-get install -y --no-install-recommends \
