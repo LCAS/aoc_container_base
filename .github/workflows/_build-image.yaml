@@ -11,7 +11,7 @@ on:
         description: Image name on the LCAS registry
         required: true
         type: string
-      ros_dist:
+      ros_distro:
         required: true
         type: string
       dockerfile:
@@ -52,16 +52,16 @@ jobs:
         with:
           flavor: latest=false
           labels: |
-            org.opencontainers.image.description=AOC Docker Image (${{ inputs.push_image }}, ${{ inputs.ros_dist }})
+            org.opencontainers.image.description=AOC Docker Image (${{ inputs.push_image }}, ${{ inputs.ros_distro }})
             org.opencontainers.image.authors=L-CAS Team
           images: lcas.lincoln.ac.uk/${{ inputs.push_image }}
           tags: |
-            type=raw,value=${{ inputs.ros_dist }}-staging
-            type=raw,enable=${{ github.event_name != 'pull_request' }},value=${{ inputs.ros_dist }}-latest
-            type=ref,enable=${{ github.event_name != 'pull_request' }},event=branch,prefix=${{ inputs.ros_dist }}-
-            type=semver,pattern={{version}},prefix=${{ inputs.ros_dist }}-
-            type=semver,pattern={{major}}.{{minor}},prefix=${{ inputs.ros_dist }}-
-            type=semver,pattern={{major}},prefix=${{ inputs.ros_dist }}-
+            type=raw,value=${{ inputs.ros_distro }}-staging
+            type=raw,enable=${{ github.event_name != 'pull_request' }},value=${{ inputs.ros_distro }}-latest
+            type=ref,enable=${{ github.event_name != 'pull_request' }},event=branch,prefix=${{ inputs.ros_distro }}-
+            type=semver,pattern={{version}},prefix=${{ inputs.ros_distro }}-
+            type=semver,pattern={{major}}.{{minor}},prefix=${{ inputs.ros_distro }}-
+            type=semver,pattern={{major}},prefix=${{ inputs.ros_distro }}-
 
       - uses: docker/setup-buildx-action@v3
 
@@ -73,10 +73,10 @@ jobs:
           file: ./${{ inputs.dockerfile }}
           platforms: ${{ inputs.architectures }}
           push: true
-          cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.ros_dist }}
-          cache-to:   type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.ros_dist }},mode=max
+          cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.ros_distro }}
+          cache-to:   type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.ros_distro }},mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             BASE_IMAGE=${{ inputs.base_image }}
-            ROS_DISTRO=${{ inputs.ros_dist }}
+            ROS_DISTRO=${{ inputs.ros_distro }}
