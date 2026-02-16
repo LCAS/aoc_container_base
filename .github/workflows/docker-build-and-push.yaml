@@ -21,6 +21,7 @@ jobs:
         max-parallel: 1
         matrix:
           include:
+            # humble
             - base_image: ros:humble
               push_image: ros
               ros_dist: humble
@@ -41,6 +42,14 @@ jobs:
               stage: desktop
               dockerfile: cuda.dockerfile
               architectures: linux/amd64
+
+            # jazzy
+            - base_image: ros:jazzy
+              push_image: ros
+              ros_dist: jazzy
+              stage: base
+              dockerfile: base.dockerfile
+              architectures: linux/amd64,linux/arm64
 
             - base_image: nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
               push_image: ros_cuda
