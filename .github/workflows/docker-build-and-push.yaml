@@ -42,6 +42,20 @@ jobs:
               dockerfile: cuda.dockerfile
               architectures: linux/amd64
 
+            - base_image: nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
+              push_image: ros_cuda
+              ros_dist: jazzy
+              stage: base
+              dockerfile: cuda.dockerfile
+              architectures: linux/amd64
+
+            - base_image: nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
+              push_image: ros_cuda_desktop
+              ros_dist: jazzy
+              stage: desktop
+              dockerfile: cuda.dockerfile
+              architectures: linux/amd64
+
               
     steps:
     - name: Node Js
