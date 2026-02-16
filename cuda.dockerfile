@@ -4,6 +4,8 @@ ARG ROS_DISTRO=humble
 
 ###########################################
 FROM ${BASE_IMAGE} AS base
+ARG BASE_IMAGE
+ARG ROS_DISTRO
  
 ENV BASE_IMAGE=${BASE_IMAGE}
 ENV ROS_DISTRO=${ROS_DISTRO}
