@@ -23,13 +23,13 @@ jobs:
           include:
             - base_image: ros:humble
               push_image: ros
-              push_tag_prefix: humble
+              ros_dist: humble
               dockerfile: base.dockerfile
               architectures: linux/amd64,linux/arm64
 
             - base_image: nvidia/cuda:11.8.0-runtime-ubuntu22.04
               push_image: ros_cuda
-              push_tag_prefix: humble
+              ros_dist: humble
               dockerfile: cuda.dockerfile
               architectures: linux/amd64
 
@@ -64,12 +64,12 @@ jobs:
           lcas.lincoln.ac.uk/${{ matrix.push_image }}
         # generate Docker tags based on the following events/attributes
         tags: |
-          type=raw,value=${{ matrix.push_tag_prefix }}-staging
-          type=raw,enable=${{ github.event_name != 'pull_request' }},value=${{ matrix.push_tag_prefix }}-latest
-          type=ref,enable=${{ github.event_name != 'pull_request' }},event=branch,prefix=${{ matrix.push_tag_prefix }}-
-          type=semver,pattern={{version}},prefix=${{ matrix.push_tag_prefix }}-
-          type=semver,pattern={{major}}.{{minor}},prefix=${{ matrix.push_tag_prefix }}-
-          type=semver,pattern={{major}},prefix=${{ matrix.push_tag_prefix }}-
+          type=raw,value=${{ matrix.ros_dist }}-staging
+          type=raw,enable=${{ github.event_name != 'pull_request' }},value=${{ matrix.ros_dist }}-latest
+          type=ref,enable=${{ github.event_name != 'pull_request' }},event=branch,prefix=${{ matrix.ros_dist }}-
+          type=semver,pattern={{version}},prefix=${{ matrix.ros_dist }}-
+          type=semver,pattern={{major}}.{{minor}},prefix=${{ matrix.ros_dist }}-
+          type=semver,pattern={{major}},prefix=${{ matrix.ros_dist }}-
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -81,9 +81,10 @@ jobs:
         file: ./${{ matrix.dockerfile }}
         platforms: ${{ matrix.architectures }}
         push: true
-        cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ matrix.push_image }}:${{ matrix.push_tag_prefix }}
-        cache-to: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ matrix.push_image }}:${{ matrix.push_tag_prefix }},mode=max
+        cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ matrix.push_image }}:${{ matrix.ros_dist }}
+        cache-to: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ matrix.push_image }}:${{ matrix.ros_dist }},mode=max
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         build-args: |
             BASE_IMAGE=${{ matrix.base_image }}
+            ROS_DISTRO=${{ matrix.ros_dist }}
