@@ -63,11 +63,11 @@ jobs:
             type=semver,pattern={{major}}.{{minor}},prefix=${{ inputs.ros_dist }}-
             type=semver,pattern={{major}},prefix=${{ inputs.ros_dist }}-
 
+      - uses: docker/setup-buildx-action@v3
+
       - name: Build and push
         id: build
-        uses: docker/setup-buildx-action@v3
-
-      - uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v6
         with:
           context: ./docker
           file: ./${{ inputs.dockerfile }}
