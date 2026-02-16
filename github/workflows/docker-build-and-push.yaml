@@ -1,0 +1,79 @@
+name: Build AOC Docker Images
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - '*'
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: 
+      - lcas
+      - qemu
+    strategy:
+        fail-fast: false
+        matrix:
+          include:
+            - base_image: ros:humble
+              push_image: ros
+              push_tag_prefix: humble
+              dockerfile: base.dockerfile
+  
+    steps:
+    - name: Node Js
+      uses: actions/setup-node@v4
+    - uses: actions/checkout@v3
+    - name: What
+      run: echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+    - name: Docker Login LCAS
+      uses: docker/login-action@v3
+      with:
+        # Server address of Docker registry. If not set then will default to Docker Hub
+        registry: lcas.lincoln.ac.uk
+        # Username used to log against the Docker registry
+        username: ${{ secrets.LCAS_REGISTRY_PUSHER }}
+        # Password or personal access token used to log against the Docker registry
+        password: ${{ secrets.LCAS_REGISTRY_TOKEN }}
+
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        flavor: |
+          latest=false
+        labels: |
+          org.opencontainers.image.description=AOC Docker Image (flavour: ${{ matrix.push_tag }}, multiarch)
+          org.opencontainers.image.authors=L-CAS Team
+        # list of Docker images to use as base name for tags
+        images: |
+          lcas.lincoln.ac.uk/${{ matrix.push_image }}
+        # generate Docker tags based on the following events/attributes
+        tags: |
+          type=raw,value=${{ matrix.push_tag_prefix }}-staging
+          type=raw,enable=${{ github.event_name != 'pull_request' }},value=${{ matrix.push_tag_prefix }}-latest
+          type=ref,enable=${{ github.event_name != 'pull_request' }},event=branch,prefix=${{ matrix.push_tag_prefix }}-
+          type=semver,pattern={{version}},prefix=${{ matrix.push_tag_prefix }}-
+          type=semver,pattern={{major}}.{{minor}},prefix=${{ matrix.push_tag_prefix }}-
+          type=semver,pattern={{major}},prefix=${{ matrix.push_tag_prefix }}-
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Docker Image
+      uses: docker/build-push-action@v6
+      with:
+        context: ./docker
+        file: ./${{ matrix.dockerfile }}
+        platforms: linux/amd64,linux/arm64
+        push: true
+        cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ matrix.push_image }}:${{ matrix.push_tag_prefix }}
+        cache-to: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ matrix.push_image }}:${{ matrix.push_tag_prefix }},mode=max
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+            BASE_IMAGE=${{ matrix.base_image }}
