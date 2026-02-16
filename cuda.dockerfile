@@ -26,6 +26,7 @@ RUN apt-get update ; \
   software-properties-common \
   wget \
   tzdata \
+  python3-rosdep \
   && locale-gen en_US.UTF-8 \
   && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
   && rm -rf /var/lib/apt/lists/*
@@ -44,3 +45,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep update
+
+FROM base AS desktop
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-${ROS_DISTRO}-desktop \
+    && rm -rf /var/lib/apt/lists/*
