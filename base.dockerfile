@@ -13,4 +13,4 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     wget \
     unzip
 
-RUN rosdep init && rosdep update
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep update
