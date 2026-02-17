@@ -10,6 +10,16 @@ on:
 
 jobs:
 
+  # ── VNC Container Building  ──────────────────────-────────────────────────
+  vnc:
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image:    debian:trixie-slim
+      push_image:    vnc
+      dockerfile:    vnc.dockerfile
+      architectures: linux/amd64,linux/arm64
+    secrets: inherit
+
   # ── Level 0: no dependencies ──────────────────────────────────────────────
 
   ros-humble:
