@@ -12,7 +12,7 @@ on:
         required: true
         type: string
       ros_distro:
-        required: true
+        required: false
         type: string
       dockerfile:
         required: true
