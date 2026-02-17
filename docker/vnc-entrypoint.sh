@@ -2,7 +2,7 @@
 
 echo
 echo "****************************************************************************************************************************************"
-echo "AOC Display container starting..."
+echo "AOC VNC container starting..."
 echo "****************************************************************************************************************************************"
 
 
@@ -62,7 +62,7 @@ echo "xhost +local: applied to :1"
 
 echo 
 echo "****************************************************************************************************************************************"
-echo "Desktop ready. Open your browser at http://localhost:5801/vnc.html?autoconnect=true or another hostname and port you may have forwarded."
+echo "VNC Desktop ready. Open your browser at http://localhost:5801/vnc.html?autoconnect=true or another hostname and port you may have forwarded."
 echo "****************************************************************************************************************************************"
 echo
 

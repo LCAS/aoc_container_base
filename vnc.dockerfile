@@ -1,6 +1,9 @@
-FROM debian:trixie-slim AS base
+ARG BASE_IMAGE=debian:trixie-slim
+FROM ${BASE_IMAGE} AS base
 
+ARG BASE_IMAGE
 ARG username=aoc
+ENV BASE_IMAGE=${BASE_IMAGE}
 
 ENV DEBIAN_FRONTEND=noninteractive \
     DISPLAY=:1 \
@@ -22,7 +25,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gnupg2 \
     lsb-release \
-    git \
     nano \
     sudo \
     python3-setuptools \
@@ -104,7 +106,7 @@ RUN apt-get purge -y xfce4-screensaver
 
 # thunar 
 
-COPY docker/display-entrypoint.sh /entrypoint.sh
+COPY docker/vnc-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
 
