@@ -65,6 +65,9 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
+      - name: Extract architecture
+        run: echo "TARGET_ARCH=${{ inputs.architectures }}" | sed 's|linux/||g' >> $GITHUB_ENV
+
       - name: Build and push
         id: build
         uses: docker/build-push-action@v6
@@ -80,4 +83,4 @@ jobs:
           build-args: |
             BASE_IMAGE=${{ inputs.base_image }}
             ROS_DISTRO=${{ inputs.ros_distro }}
-            TARGET_ARCH=${{ inputs.architectures##*/ }}
+            TARGET_ARCH=${{ env.TARGET_ARCH }}
