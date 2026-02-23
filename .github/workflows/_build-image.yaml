@@ -80,3 +80,4 @@ jobs:
           build-args: |
             BASE_IMAGE=${{ inputs.base_image }}
             ROS_DISTRO=${{ inputs.ros_distro }}
+            TARGET_ARCH=${{ inputs.architectures##*/ }}

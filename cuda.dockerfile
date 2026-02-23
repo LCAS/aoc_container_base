@@ -1,5 +1,6 @@
 ARG BASE_IMAGE=nvidia/cuda:11.8.0-runtime-ubuntu22.04
 ARG ROS_DISTRO=humble
+ARG TARGET_ARCH
 
 ###########################################
 FROM ${BASE_IMAGE} AS base
@@ -46,10 +47,10 @@ RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
 
 # Setup VirtualGL
 ARG VIRTUALGL_VERSION=3.1.4
-RUN curl -L -O https://github.com/VirtualGL/virtualgl/releases/download/${VIRTUALGL_VERSION}/virtualgl_${VIRTUALGL_VERSION}_${TARGETARCH}.deb && \
+RUN curl -L -O https://github.com/VirtualGL/virtualgl/releases/download/${VIRTUALGL_VERSION}/virtualgl_${VIRTUALGL_VERSION}_${TARGET_ARCH}.deb && \
   apt-get update && \
-  apt-get -y install ./virtualgl_${VIRTUALGL_VERSION}_${TARGETARCH}.deb && \
-  rm virtualgl_${VIRTUALGL_VERSION}_${TARGETARCH}.deb && rm -rf /var/lib/apt/lists/* 
+  apt-get -y install ./virtualgl_${VIRTUALGL_VERSION}_${TARGET_ARCH}.deb && \
+  rm virtualgl_${VIRTUALGL_VERSION}_${TARGET_ARCH}.deb && rm -rf /var/lib/apt/lists/* 
 
 # Create a non-root user
 ARG USERNAME=ros
