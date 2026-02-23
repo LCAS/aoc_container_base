@@ -44,11 +44,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
 
+# Setup VirtualGL
+ARG VIRTUALGL_VERSION=3.1.4
+RUN curl -L -O https://github.com/VirtualGL/virtualgl/releases/download/${VIRTUALGL_VERSION}/virtualgl_${VIRTUALGL_VERSION}_${TARGETARCH}.deb && \
+  apt-get update && \
+  apt-get -y install ./virtualgl_${VIRTUALGL_VERSION}_${TARGETARCH}.deb && \
+  rm virtualgl_${VIRTUALGL_VERSION}_${TARGETARCH}.deb && rm -rf /var/lib/apt/lists/* 
+
+# Create a non-root user
 ARG USERNAME=ros
 ARG USER_UID=1001
 ARG USER_GID=$USER_UID
 
-# Create a non-root user
 RUN groupadd --gid $USER_GID $USERNAME \
   && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
   # Add sudo support for the non-root user
