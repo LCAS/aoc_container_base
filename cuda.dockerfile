@@ -47,6 +47,7 @@ RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
 
 # Setup VirtualGL
 ARG VIRTUALGL_VERSION=3.1.4
+ENV TARGET_ARCH=${TARGET_ARCH}
 RUN curl -L -O https://github.com/VirtualGL/virtualgl/releases/download/${VIRTUALGL_VERSION}/virtualgl_${VIRTUALGL_VERSION}_${TARGET_ARCH}.deb && \
   apt-get update && \
   apt-get -y install ./virtualgl_${VIRTUALGL_VERSION}_${TARGET_ARCH}.deb && \
