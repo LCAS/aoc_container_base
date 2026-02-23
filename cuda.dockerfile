@@ -1,12 +1,11 @@
 ARG BASE_IMAGE=nvidia/cuda:11.8.0-runtime-ubuntu22.04
 ARG ROS_DISTRO=humble
-ARG TARGET_ARCH
 
 ###########################################
 FROM ${BASE_IMAGE} AS base
 ARG BASE_IMAGE
 ARG ROS_DISTRO
- 
+
 ENV BASE_IMAGE=${BASE_IMAGE}
 ENV ROS_DISTRO=${ROS_DISTRO}
 
@@ -39,19 +38,16 @@ RUN add-apt-repository universe \
   && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ros-${ROS_DISTRO}-ros-base \
-    python3-rosdep \
-    && rm -rf /var/lib/apt/lists/*
+  ros-${ROS_DISTRO}-ros-base \
+  python3-rosdep \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
 
 # Setup VirtualGL
-ARG VIRTUALGL_VERSION=3.1.4
-ENV TARGET_ARCH=${TARGET_ARCH}
-RUN curl -L -O https://github.com/VirtualGL/virtualgl/releases/download/${VIRTUALGL_VERSION}/virtualgl_${VIRTUALGL_VERSION}_${TARGET_ARCH}.deb && \
-  apt-get update && \
-  apt-get -y install ./virtualgl_${VIRTUALGL_VERSION}_${TARGET_ARCH}.deb && \
-  rm virtualgl_${VIRTUALGL_VERSION}_${TARGET_ARCH}.deb && rm -rf /var/lib/apt/lists/* 
+RUN wget -q -O- https://packagecloud.io/dcommander/virtualgl/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/VirtualGL.gpg && \
+  echo "deb [signed-by=/etc/apt/trusted.gpg.d/VirtualGL.gpg] https://packagecloud.io/dcommander/virtualgl/any/ any main" >> /etc/apt/sources.list.d/virtualgl.list && \
+  apt update && apt install virtualgl && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
 ARG USERNAME=ros
@@ -60,7 +56,7 @@ ARG USER_GID=$USER_UID
 
 RUN groupadd --gid $USER_GID $USERNAME \
   && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
-  # Add sudo support for the non-root user
+  # Add sudo support for the non-root user\
   && apt-get update \
   && apt-get install -y --no-install-recommends sudo \
   && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
@@ -69,10 +65,20 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 # Configure bash profile
 RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
-    echo 'PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /etc/bash.bashrc && \
-    echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
-    echo "alias t='tmux'" >> /etc/bash.bashrc && \
-    echo "alias cls='clear'" >> /etc/bash.bashrc
+  echo 'PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /etc/bash.bashrc && \
+  echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
+  echo "alias t='tmux'" >> /etc/bash.bashrc && \
+  echo "alias cls='clear'" >> /etc/bash.bashrc
+
+ENV TVNC_VGL=1
+ENV VGL_ISACTIVE=1
+ENV VGL_FPS=25
+ENV VGL_COMPRESS=0
+ENV VGL_DISPLAY=egl
+ENV VGL_WM=1
+ENV VGL_PROBEGLX=0
+ENV LD_PRELOAD=/usr/lib/libdlfaker.so:/usr/lib/libvglfaker.so
+ENV SHELL=/bin/bash
 
 CMD ["bash", "-l"]
 
