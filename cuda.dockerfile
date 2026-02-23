@@ -47,7 +47,7 @@ RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
 # Setup VirtualGL
 RUN wget -q -O- https://packagecloud.io/dcommander/virtualgl/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/VirtualGL.gpg && \
   echo "deb [signed-by=/etc/apt/trusted.gpg.d/VirtualGL.gpg] https://packagecloud.io/dcommander/virtualgl/any/ any main" >> /etc/apt/sources.list.d/virtualgl.list && \
-  apt update && apt install virtualgl && rm -rf /var/lib/apt/lists/*
+  apt update && apt install -y virtualgl && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
 ARG USERNAME=ros
