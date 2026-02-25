@@ -2,7 +2,7 @@ ARG BASE_IMAGE=debian:trixie-slim
 FROM ${BASE_IMAGE} AS base
 
 ARG BASE_IMAGE
-ARG username=aoc
+ARG username=lcas
 ENV BASE_IMAGE=${BASE_IMAGE}
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -56,18 +56,19 @@ RUN mkdir -p /tmp/.X11-unix && \
     chmod 1777 /tmp/.X11-unix
 
 # Install VirtualGL
-ARG TARGETARCH
-ENV DEBIAN_FRONTEND=noninteractive
-RUN curl -L -O https://github.com/VirtualGL/virtualgl/releases/download/3.1.1/virtualgl_3.1.1_${TARGETARCH}.deb && \
-    apt-get update && \
-    apt-get -y install ./virtualgl_3.1.1_${TARGETARCH}.deb && \
-    rm virtualgl_3.1.1_${TARGETARCH}.deb && rm -rf /var/lib/apt/lists/* 
-RUN curl -L -O https://github.com/TurboVNC/turbovnc/releases/download/3.1.1/turbovnc_3.1.1_${TARGETARCH}.deb && \
-    apt-get update && \
-    apt-get -y install ./turbovnc_3.1.1_${TARGETARCH}.deb && \
-    rm turbovnc_3.1.1_${TARGETARCH}.deb && rm -rf /var/lib/apt/lists/* 
-RUN addgroup --system vglusers && adduser ${username} vglusers
+RUN wget -q -O- https://packagecloud.io/dcommander/virtualgl/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/VirtualGL.gpg && \
+    echo "deb [signed-by=/etc/apt/trusted.gpg.d/VirtualGL.gpg] https://packagecloud.io/dcommander/virtualgl/any/ any main" >> /etc/apt/sources.list.d/virtualgl.list && \
+    apt update && apt install -y virtualgl libgl1 && rm -rf /var/lib/apt/lists/*
 
+# RUN curl -L -O https://github.com/TurboVNC/turbovnc/releases/download/3.1.1/turbovnc_3.1.1_${TARGETARCH}.deb && \
+#     apt-get update && \
+#     apt-get -y install ./turbovnc_3.1.1_${TARGETARCH}.deb && \
+#     rm turbovnc_3.1.1_${TARGETARCH}.deb && rm -rf /var/lib/apt/lists/* 
+
+# Install TurboVNC
+RUN wget -q -O- https://packagecloud.io/dcommander/turbovnc/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/TurboVNC.gpg && \
+    echo "deb [signed-by=/etc/apt/trusted.gpg.d/TurboVNC.gpg] https://packagecloud.io/dcommander/turbovnc/any/ any main" >> /etc/apt/sources.list.d/TurboVNC.list && \
+    apt update && apt install -y turbovnc && rm -rf /var/lib/apt/lists/*
 
 # Install noVNC
 ENV NOVNC_VERSION=1.4.0
@@ -112,28 +113,13 @@ ENTRYPOINT [ "/entrypoint.sh" ]
 
 # Set default XFCE wallpaper -- doesnt work
 # COPY aoc_wallpaper.jpg /usr/share/backgrounds/xfce/aoc_wallpaper.jpg
-# RUN mkdir -p /home/${username}/.config/xfce4/xfconf/xfce-perchannel-xml && \
-#     cat > /home/${username}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml <<'EOF'
-# <?xml version="1.0" encoding="UTF-8"?>
-# <channel name="xfce4-desktop" version="1.0">
-#   <property name="backdrop" type="empty">
-#     <property name="screen0" type="empty">
-#       <property name="monitor0" type="empty">
-#         <property name="image-path" type="string" value="/usr/share/backgrounds/xfce/aoc_wallpaper.jpg"/>
-#                 <property name="last-image" type="string" value="/usr/share/backgrounds/xfce/aoc_wallpaper.jpg"/>
-#         <property name="image-show" type="bool" value="true"/>
-#                 <property name="workspace0" type="empty">
-#                     <property name="last-image" type="string" value="/usr/share/backgrounds/xfce/aoc_wallpaper.jpg"/>
-#                 </property>
-#       </property>
-#     </property>
-#   </property>
-# </channel>
-# EOF
-RUN chown -R ${username}:${username} /home/${username}/.config
 
 # Allow other containers to share windows into this display
-RUN echo 'xhost +local: 2>/dev/null' >> ~/.bashrc
+RUN echo 'xhost +local: 2>/dev/null' >> ~/.bashrc && \
+    echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
+    echo "alias t='tmux'" >> /etc/bash.bashrc && \
+    echo "alias cls='clear'" >> /etc/bash.bashrc && \
+    echo 'echo -e "$(printf "%80s" | tr " " "-") \nYou are inside the VNC container,\n - You do not have access to ROS in this terminal\n - You may docker exec into other containers.\n$(printf "%80s" | tr " " "-")\n"' >> /etc/bash.bashrc
 
 EXPOSE 5801
 
