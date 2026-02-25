@@ -25,9 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gnupg2 \
     lsb-release \
-    nano \
     sudo \
-    python3-setuptools \
     wget \
     libglvnd0 \
     libgl1 \
@@ -36,12 +34,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxext6 \
     libx11-6 \
     x11-utils \
-    python3-minimal \
-    python3-pip \
-    python3-numpy \
-    python3-venv \
     less \
-    tmux \
     screen \
     unzip \
     x11-apps \
@@ -60,10 +53,14 @@ RUN wget -q -O- https://packagecloud.io/dcommander/virtualgl/gpgkey | gpg --dear
     echo "deb [signed-by=/etc/apt/trusted.gpg.d/VirtualGL.gpg] https://packagecloud.io/dcommander/virtualgl/any/ any main" >> /etc/apt/sources.list.d/virtualgl.list && \
     apt update && apt install -y virtualgl libgl1 && rm -rf /var/lib/apt/lists/*
 
-# RUN curl -L -O https://github.com/TurboVNC/turbovnc/releases/download/3.1.1/turbovnc_3.1.1_${TARGETARCH}.deb && \
-#     apt-get update && \
-#     apt-get -y install ./turbovnc_3.1.1_${TARGETARCH}.deb && \
-#     rm turbovnc_3.1.1_${TARGETARCH}.deb && rm -rf /var/lib/apt/lists/* 
+RUN cat <<EOF > /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+{
+    "file_format_version" : "1.0.0",
+    "ICD" : {
+        "library_path" : "libEGL_nvidia.so.0"
+    }
+}
+EOF
 
 # Install TurboVNC
 RUN wget -q -O- https://packagecloud.io/dcommander/turbovnc/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/TurboVNC.gpg && \
@@ -73,7 +70,6 @@ RUN wget -q -O- https://packagecloud.io/dcommander/turbovnc/gpgkey | gpg --dearm
 # Install noVNC
 ENV NOVNC_VERSION=1.4.0
 ENV WEBSOCKETIFY_VERSION=0.10.0
-
 RUN mkdir -p /usr/local/novnc && \
 curl -sSL https://github.com/novnc/noVNC/archive/v${NOVNC_VERSION}.zip -o /tmp/novnc-install.zip && \
 unzip /tmp/novnc-install.zip -d /usr/local/novnc && \
@@ -83,15 +79,6 @@ unzip /tmp/websockify-install.zip -d /usr/local/novnc && \
 ln -s /usr/local/novnc/websockify-${WEBSOCKETIFY_VERSION} /usr/local/novnc/noVNC-${NOVNC_VERSION}/utils/websockify && \
 rm -f /tmp/websockify-install.zip /tmp/novnc-install.zip && \
 sed -i -E 's/^python /python3 /' /usr/local/novnc/websockify-${WEBSOCKETIFY_VERSION}/run
-
-RUN cat <<EOF > /usr/share/glvnd/egl_vendor.d/10_nvidia.json
-{
-    "file_format_version" : "1.0.0",
-    "ICD" : {
-        "library_path" : "libEGL_nvidia.so.0"
-    }
-}
-EOF
 
 FROM base AS xfce
 
@@ -104,8 +91,6 @@ RUN apt-get update && \
     konsole \
     && rm -rf /var/lib/apt/lists/*
 RUN apt-get purge -y xfce4-screensaver
-
-# thunar 
 
 COPY docker/vnc-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -138,3 +123,22 @@ ENV VGL_WM=1
 ENV VGL_PROBEGLX=0
 ENV LD_PRELOAD=/usr/lib/libdlfaker.so:/usr/lib/libvglfaker.so
 ENV SHELL=/bin/bash
+
+FROM xfce AS docker-tools
+
+ARG DOCKER_GID=984
+
+# Install Docker (for docker exec etc)
+USER root
+RUN apt-get update && \
+    apt-get install -y ca-certificates curl && \
+    install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo $VERSION_CODENAME) stable" > /etc/apt/sources.list.d/docker.list && \
+    apt-get update && \
+    apt-get install -y docker-ce-cli && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd -g $DOCKER_GID docker && \
+    usermod -aG docker ${username}
+
+USER ${username}
