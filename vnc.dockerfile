@@ -71,14 +71,14 @@ RUN wget -q -O- https://packagecloud.io/dcommander/turbovnc/gpgkey | gpg --dearm
 ENV NOVNC_VERSION=1.4.0
 ENV WEBSOCKETIFY_VERSION=0.10.0
 RUN mkdir -p /usr/local/novnc && \
-curl -sSL https://github.com/novnc/noVNC/archive/v${NOVNC_VERSION}.zip -o /tmp/novnc-install.zip && \
-unzip /tmp/novnc-install.zip -d /usr/local/novnc && \
-cp /usr/local/novnc/noVNC-${NOVNC_VERSION}/vnc.html /usr/local/novnc/noVNC-${NOVNC_VERSION}/index.html && \
-curl -sSL https://github.com/novnc/websockify/archive/v${WEBSOCKETIFY_VERSION}.zip -o /tmp/websockify-install.zip && \
-unzip /tmp/websockify-install.zip -d /usr/local/novnc && \
-ln -s /usr/local/novnc/websockify-${WEBSOCKETIFY_VERSION} /usr/local/novnc/noVNC-${NOVNC_VERSION}/utils/websockify && \
-rm -f /tmp/websockify-install.zip /tmp/novnc-install.zip && \
-sed -i -E 's/^python /python3 /' /usr/local/novnc/websockify-${WEBSOCKETIFY_VERSION}/run
+    curl -sSL https://github.com/novnc/noVNC/archive/v${NOVNC_VERSION}.zip -o /tmp/novnc-install.zip && \
+    unzip /tmp/novnc-install.zip -d /usr/local/novnc && \
+    cp /usr/local/novnc/noVNC-${NOVNC_VERSION}/vnc.html /usr/local/novnc/noVNC-${NOVNC_VERSION}/index.html && \
+    curl -sSL https://github.com/novnc/websockify/archive/v${WEBSOCKETIFY_VERSION}.zip -o /tmp/websockify-install.zip && \
+    unzip /tmp/websockify-install.zip -d /usr/local/novnc && \
+    ln -s /usr/local/novnc/websockify-${WEBSOCKETIFY_VERSION} /usr/local/novnc/noVNC-${NOVNC_VERSION}/utils/websockify && \
+    rm -f /tmp/websockify-install.zip /tmp/novnc-install.zip && \
+    sed -i -E 's/^python /python3 /' /usr/local/novnc/websockify-${WEBSOCKETIFY_VERSION}/run
 
 FROM base AS xfce
 
@@ -102,7 +102,6 @@ ENTRYPOINT [ "/entrypoint.sh" ]
 # Allow other containers to share windows into this display
 RUN echo 'xhost +local: 2>/dev/null' >> ~/.bashrc && \
     echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
-    echo "alias t='tmux'" >> /etc/bash.bashrc && \
     echo "alias cls='clear'" >> /etc/bash.bashrc && \
     echo 'echo -e "$(printf "%80s" | tr " " "-") \nYou are inside the VNC container,\n - You do not have access to ROS in this terminal\n - You may docker exec into other containers.\n$(printf "%80s" | tr " " "-")\n"' >> /etc/bash.bashrc
 
