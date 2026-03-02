@@ -5,12 +5,8 @@ echo "**************************************************************************
 echo "AOC VNC container starting..."
 echo "****************************************************************************************************************************************"
 
-
-echo "starting turbovnc"
 sudo rm -rf /tmp/.X1-lock /tmp/.X11-unix/X1 > /dev/null 2>&1
-# screen -dmS turbovnc bash -c 'VGL_DISPLAY=egl VGL_FPS=30 /opt/TurboVNC/bin/vncserver :1 -depth 24 -noxstartup -securitytypes TLSNone,X509None,None 2>&1 | tee /tmp/vnc.log; read -p "Press any key to continue..."'
 screen -dmS turbovnc bash -c '/opt/TurboVNC/bin/vncserver :1 -depth 24 -noxstartup -securitytypes TLSNone,X509None,None 2>&1 | tee /tmp/vnc.log; read -p "Press any key to continue..."'
-# wait for VNC to be running
 
 echo "waiting for display to be up"
 while ! xdpyinfo -display :1 2> /dev/null > /dev/null; do
@@ -35,31 +31,22 @@ screen -dmS novnc bash -c '/usr/local/novnc/noVNC-${NOVNC_VERSION}/utils/novnc_p
 DISPLAY=:1 xhost +local: 2>/dev/null
 echo "xhost +local: applied to :1"
 
-# # ensure wallpaper/panels are applied; start xfdesktop if missing
-# ( 
-#   sleep 8
-#   export DISPLAY=:1
-#   export DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS"
+# set the wallpaper
+(
+  export DISPLAY=:1
+  CURRENT_USER="$(id -un)"
+  VNC_WALLPAPER=${VNC_WALLPAPER:-lcas}
+  WALLPAPER="/usr/share/backgrounds/xfce/${VNC_WALLPAPER}.jpg"
+  base="/backdrop/screen0/monitorVNC-0/workspace0"
 
-#   # start xfdesktop if not running so it can apply the wallpaper
-#   if ! pgrep -u "$USER" xfdesktop > /dev/null 2>&1; then
-#     xfdesktop --daemon > /dev/null 2>&1 || true
-#   fi
+  xfconf-query -c xfce4-desktop -p "${base}/image-show" -n -t bool -s true
+  xfconf-query -c xfce4-desktop -p "${base}/image-style" -n -t int -s 5
+  xfconf-query -c xfce4-desktop -p "${base}/image-path" -n -t string -s "$WALLPAPER"
+  xfconf-query -c xfce4-desktop -p "${base}/last-image" -n -t string -s "$WALLPAPER"
+  xfconf-query -c xfce4-desktop -p "${base}/last-single-image" -n -t string -s "$WALLPAPER"
 
-#   WALLPAPER="/usr/share/backgrounds/xfce/aoc_wallpaper.jpg"
-
-#   # apply wallpaper for monitor0 (add others if needed)
-#   xfconf-query -c xfce4-desktop -np /backdrop/screen0/monitor0/image-path -t string -s "$WALLPAPER" > /dev/null 2>&1
-#   xfconf-query -c xfce4-desktop -np /backdrop/screen0/monitor0/last-image -t string -s "$WALLPAPER" > /dev/null 2>&1
-#   xfconf-query -c xfce4-desktop -np /backdrop/screen0/monitor0/workspace0/last-image -t string -s "$WALLPAPER" > /dev/null 2>&1
-#   xfconf-query -c xfce4-desktop -np /backdrop/screen0/monitor0/image-show -t bool -s true > /dev/null 2>&1
-
-#   # remove secondary panel if present
-#   xfconf-query -c xfce4-panel -p /panels/panel-2 -r > /dev/null 2>&1 || true
-#   xfce4-panel --reload > /dev/null 2>&1 || true
-
-#   xfdesktop --reload > /dev/null 2>&1 || true
-# ) &
+  # xfdesktop --reload
+) &
 
 echo 
 echo "****************************************************************************************************************************************"

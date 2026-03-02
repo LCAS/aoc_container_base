@@ -96,8 +96,8 @@ COPY docker/vnc-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
 
-# Set default XFCE wallpaper -- doesnt work
-# COPY aoc_wallpaper.jpg /usr/share/backgrounds/xfce/aoc_wallpaper.jpg
+# Copy in wallpaper
+COPY ./docker/wallpapers/*.jpg /usr/share/backgrounds/xfce/
 
 # Allow other containers to share windows into this display
 RUN echo 'xhost +local: 2>/dev/null' >> ~/.bashrc && \
