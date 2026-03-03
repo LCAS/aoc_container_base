@@ -12,16 +12,16 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     build-essential \
+    ca-certificates \
     cmake \
     git \
     curl \
     wget \
     unzip \
     ros-${ROS_DISTRO}-ros-base \
-    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
     python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
-
+    
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep update
 
 ARG USERNAME=ros
@@ -38,6 +38,10 @@ RUN groupadd --gid $USER_GID $USERNAME \
   && chmod 0440 /etc/sudoers.d/$USERNAME \
   && rm -rf /var/lib/apt/lists/*
 
+# Cyclone DDS
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    && rm -rf /var/lib/apt/lists/*
 COPY cyclonedds.xml /etc/cyclonedds.xml 
   
 # Configure bash profile
@@ -49,5 +53,6 @@ RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root
     echo "RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /etc/bash.bashrc && \
     echo "CYCLONEDDS_URI=file:///etc/cyclonedds.xml" >> /etc/bash.bashrc
 
+USER ros
 CMD ["bash", "-l"]
 

@@ -17,6 +17,7 @@ RUN apt-get update ; \
   apt-get install -y --no-install-recommends \
   locales \
   curl \
+  ca-certificates \
   gnupg2 \
   lsb-release \
   git \
@@ -39,10 +40,13 @@ RUN add-apt-repository universe \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   ros-${ROS_DISTRO}-ros-base \
-  ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
   python3-rosdep \
   && rm -rf /var/lib/apt/lists/*
 
+# Cyclone DDS
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+  ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+  && rm -rf /var/lib/apt/lists/*
 COPY cyclonedds.xml /etc/cyclonedds.xml 
 
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
