@@ -18,6 +18,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     wget \
     unzip \
     ros-${ROS_DISTRO}-ros-base \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
     python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
 
@@ -37,12 +38,16 @@ RUN groupadd --gid $USER_GID $USERNAME \
   && chmod 0440 /etc/sudoers.d/$USERNAME \
   && rm -rf /var/lib/apt/lists/*
 
+COPY ./docker/cyclonedds.xml /etc/cyclonedds.xml 
+  
 # Configure bash profile
 RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
     echo 'PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /etc/bash.bashrc && \
     echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
     echo "alias t='tmux'" >> /etc/bash.bashrc && \
-    echo "alias cls='clear'" >> /etc/bash.bashrc
+    echo "alias cls='clear'" >> /etc/bash.bashrc && \
+    echo "RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /etc/bash.bashrc && \
+    echo "CYCLONEDDS_URI=file:///etc/cyclonedds.xml" >> /etc/bash.bashrc
 
 CMD ["bash", "-l"]
 
