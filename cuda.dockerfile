@@ -43,7 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   python3-rosdep \
   && rm -rf /var/lib/apt/lists/*
 
-COPY docker/cyclonedds.xml /etc/cyclonedds.xml 
+COPY cyclonedds.xml /etc/cyclonedds.xml 
 
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
 

@@ -38,7 +38,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
   && chmod 0440 /etc/sudoers.d/$USERNAME \
   && rm -rf /var/lib/apt/lists/*
 
-COPY docker/cyclonedds.xml /etc/cyclonedds.xml 
+COPY cyclonedds.xml /etc/cyclonedds.xml 
   
 # Configure bash profile
 RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
