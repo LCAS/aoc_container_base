@@ -73,6 +73,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 # Configure bash profile
 RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
+  echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /home/${USERNAME}/.bashrc && \
   echo 'PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /etc/bash.bashrc && \
   echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
   echo "alias t='tmux'" >> /etc/bash.bashrc && \
@@ -89,6 +90,8 @@ ENV VGL_WM=1
 ENV VGL_PROBEGLX=0
 ENV LD_PRELOAD=/usr/lib/libdlfaker.so:/usr/lib/libvglfaker.so
 ENV SHELL=/bin/bash
+
+USER ${USERNAME}
 
 CMD ["bash", "-l"]
 
