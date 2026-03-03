@@ -12,7 +12,8 @@ ENV ROS_DISTRO=${ROS_DISTRO}
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install language
-RUN apt-get update ; \
+RUN apt-get clean && rm -rf /var/cache/apt/archives/* && \
+  apt-get update ; \
   apt-get upgrade -y && \
   apt-get install -y --no-install-recommends \
   locales \

@@ -10,7 +10,8 @@ ENV ROS_DISTRO=${ROS_DISTRO}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+RUN apt-get clean && rm -rf /var/cache/apt/archives/* &&\
+    apt-get update && apt-get upgrade -y && apt-get install -y \
     build-essential \
     ca-certificates \
     cmake \
