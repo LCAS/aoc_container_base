@@ -28,11 +28,11 @@ RUN apt-get install -y --no-install-recommends \
   python3-setuptools \
   software-properties-common \
   tzdata \
-  && locale-gen en_GB.UTF-8 \
-  && update-locale LC_ALL=en_GB.UTF-8 LANG=en_GB.UTF-8 \
+  && locale-gen en_US.UTF-8 \
+  && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
   && rm -rf /var/lib/apt/lists/*
 
-ENV LANG=en_GB.UTF-8
+ENV LANG=en_US.UTF-8
 
 # Prepare ROS2
 RUN add-apt-repository universe \

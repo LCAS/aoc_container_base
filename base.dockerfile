@@ -29,7 +29,7 @@ RUN apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/lib/apt/lists/*
 
-ENV LANG=en_GB.UTF-8
+ENV LANG=en_US.UTF-8
 
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep update
 
