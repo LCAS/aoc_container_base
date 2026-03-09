@@ -18,6 +18,7 @@ RUN apt-get clean && rm -rf /var/cache/apt/archives/* && \
   apt-get install -y --no-install-recommends \
   locales \
   curl \
+  wget \
   ca-certificates \
   gnupg2 \
   lsb-release \
@@ -25,7 +26,6 @@ RUN apt-get clean && rm -rf /var/cache/apt/archives/* && \
   nano \
   python3-setuptools \
   software-properties-common \
-  wget \
   tzdata \
   && locale-gen en_US.UTF-8 \
   && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
