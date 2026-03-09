@@ -10,8 +10,11 @@ ENV ROS_DISTRO=${ROS_DISTRO}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y \
+RUN apt-get update || true \
+    && apt-get install -y --no-install-recommends gnupg ca-certificates \
+    && apt-get update \
+    && apt-get upgrade -y \
+    apt-get install -y --no-install-recommends \
     build-essential \
     ca-certificates \
     cmake \
@@ -22,7 +25,11 @@ RUN apt-get update && apt-get upgrade -y && \
     ros-${ROS_DISTRO}-ros-base \
     ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
     python3-colcon-common-extensions && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* \
+    && locale-gen en_GB.UTF-8 \
+    && update-locale LC_ALL=en_GB.UTF-8 LANG=en_GB.UTF-8 \
+    && rm -rf /var/lib/apt/lists/*
+
 
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep update
 

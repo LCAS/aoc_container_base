@@ -11,9 +11,10 @@ ENV ROS_DISTRO=${ROS_DISTRO}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install language
-RUN apt-get update && \
-  apt-get upgrade -y && \
+RUN apt-get update || true \
+  && apt-get install -y --no-install-recommends gnupg ca-certificates \
+  && apt-get update \
+  && apt-get upgrade -y \
   apt-get install -y --no-install-recommends \
   locales \
   curl \
@@ -26,13 +27,11 @@ RUN apt-get update && \
   python3-setuptools \
   software-properties-common \
   tzdata \
-  && locale-gen en_US.UTF-8 \
-  && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
+  && locale-gen en_GB.UTF-8 \
+  && update-locale LC_ALL=en_GB.UTF-8 LANG=en_GB.UTF-8 \
   && rm -rf /var/lib/apt/lists/*
 
-ENV LANG=en_US.UTF-8
-
-RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+ENV LANG=en_GB.UTF-8
 
 # Prepare ROS2
 RUN add-apt-repository universe \
