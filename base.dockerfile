@@ -10,10 +10,8 @@ ENV ROS_DISTRO=${ROS_DISTRO}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get clean && rm -rf /var/cache/apt/archives/* &&\
-    apt-get update && apt-get upgrade -y
-
-RUN apt-get install -y \
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y \
     build-essential \
     ca-certificates \
     cmake \
@@ -23,8 +21,9 @@ RUN apt-get install -y \
     unzip \
     ros-${ROS_DISTRO}-ros-base \
     ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
-    python3-colcon-common-extensions \
-    && rm -rf /var/lib/apt/lists/*
+    python3-colcon-common-extensions && \
+    rm -rf /var/lib/apt/lists/*  && \
+    apt-get clean && rm -rf /var/cache/apt/archives/*
 
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep update
 
