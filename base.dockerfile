@@ -11,7 +11,9 @@ ENV ROS_DISTRO=${ROS_DISTRO}
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get clean && rm -rf /var/cache/apt/archives/* &&\
-    apt-get update && apt-get upgrade -y && apt-get install -y \
+    apt-get update && apt-get upgrade -y
+
+RUN apt-get install -y \
     build-essential \
     ca-certificates \
     cmake \
@@ -20,9 +22,10 @@ RUN apt-get clean && rm -rf /var/cache/apt/archives/* &&\
     wget \
     unzip \
     ros-${ROS_DISTRO}-ros-base \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
     python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
-    
+
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep update
 
 ARG USERNAME=ros
@@ -31,20 +34,17 @@ ARG USER_GID=$USER_UID
 
 # Create a non-root user
 RUN groupadd --gid $USER_GID $USERNAME \
-  && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
-  # Add sudo support for the non-root user
-  && apt-get update \
-  && apt-get install -y --no-install-recommends sudo \
-  && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
-  && chmod 0440 /etc/sudoers.d/$USERNAME \
-  && rm -rf /var/lib/apt/lists/*
-
-# Cyclone DDS
-RUN apt-get update && apt-get upgrade -y && apt-get install -y \
-    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    # Add sudo support for the non-root user
+    && apt-get update \
+    && apt-get install -y --no-install-recommends sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
+    && chmod 0440 /etc/sudoers.d/$USERNAME \
     && rm -rf /var/lib/apt/lists/*
+
+# Cyclone DDS Config
 COPY cyclonedds.xml /etc/cyclonedds.xml 
-  
+
 # Configure bash profile
 RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
     echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /home/${USERNAME}/.bashrc && \

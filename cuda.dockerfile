@@ -42,12 +42,10 @@ RUN add-apt-repository universe \
 RUN apt-get update && apt-get install -y --no-install-recommends \
   ros-${ROS_DISTRO}-ros-base \
   python3-rosdep \
-  && rm -rf /var/lib/apt/lists/*
-
-# Cyclone DDS
-RUN apt-get update && apt-get upgrade -y && apt-get install -y \
   ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
   && rm -rf /var/lib/apt/lists/*
+
+# Cyclone DDS Config
 COPY cyclonedds.xml /etc/cyclonedds.xml 
 
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
