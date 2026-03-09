@@ -14,8 +14,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update || true \
   && apt-get install -y --no-install-recommends gnupg ca-certificates \
   && apt-get update \
-  && apt-get upgrade -y \
-  apt-get install -y --no-install-recommends \
+  && apt-get upgrade -y
+
+RUN apt-get install -y --no-install-recommends \
   locales \
   curl \
   wget \
