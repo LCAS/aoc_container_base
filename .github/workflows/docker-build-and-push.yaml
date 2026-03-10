@@ -35,7 +35,7 @@ jobs:
   ros-cuda-humble:
     uses: ./.github/workflows/_build-image.yaml
     with:
-      base_image:    nvidia/cuda:11.8.0-runtime-ubuntu22.04
+      base_image:    nvidia/cuda:11.8.0-devel-ubuntu22.04
       push_image:    ros_cuda
       ros_distro:    humble
       dockerfile:    cuda.dockerfile
@@ -45,7 +45,7 @@ jobs:
   ros-cuda-jazzy:
     uses: ./.github/workflows/_build-image.yaml
     with:
-      base_image:    nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
+      base_image:    nvidia/cuda:12.9.1-devel-ubuntu24.04
       push_image:    ros_cuda
       ros_distro:    jazzy
       dockerfile:    cuda.dockerfile
