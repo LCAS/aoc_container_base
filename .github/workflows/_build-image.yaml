@@ -46,6 +46,9 @@ jobs:
           username: ${{ secrets.LCAS_REGISTRY_PUSHER }}
           password: ${{ secrets.LCAS_REGISTRY_TOKEN }}
 
+      - name: Pull base image
+        run: docker pull ${{ inputs.base_image }}
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -73,7 +76,7 @@ jobs:
           file: ./${{ inputs.dockerfile }}
           platforms: ${{ inputs.architectures }}
           push: true
-          no-cache:      true
+          no-cache: true
           # cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.ros_distro }}
           # cache-to:   type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.ros_distro }},mode=max
           tags: ${{ steps.meta.outputs.tags }}
