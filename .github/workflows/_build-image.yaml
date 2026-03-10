@@ -49,6 +49,9 @@ jobs:
       - name: Pull base image
         run: docker pull ${{ inputs.base_image }}
 
+      - name: Debug - Echo Date
+        run: date
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
