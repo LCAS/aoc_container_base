@@ -10,14 +10,12 @@ ENV ROS_DISTRO=${ROS_DISTRO}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update || true \
-    && apt-get install -y --no-install-recommends gnupg ca-certificates \
-    && apt-get update \
-    && apt-get upgrade -y
-
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update \
+    && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
     build-essential \
     ca-certificates \
+    gnupg \
     cmake \
     git \
     curl \
