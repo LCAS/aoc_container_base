@@ -91,18 +91,18 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 RUN apt-get purge -y xfce4-screensaver
 
-COPY docker/vnc-entrypoint.sh /entrypoint.sh
+COPY vnc-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
 
 # Copy in wallpaper
-COPY ./docker/wallpapers/*.jpg /usr/share/backgrounds/xfce/
+COPY ./wallpapers/*.jpg /usr/share/backgrounds/xfce/
 
 # Allow other containers to share windows into this display
 RUN echo 'xhost +local: 2>/dev/null' >> ~/.bashrc && \
     echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
     echo "alias cls='clear'" >> /etc/bash.bashrc && \
-    echo 'echo -e "$(printf "%80s" | tr " " "-") \nYou are inside the VNC container,\n - You do not have access to ROS in this terminal\n - You may docker exec into other containers.\n$(printf "%80s" | tr " " "-")\n"' >> /etc/bash.bashrc
+    echo 'echo -e "$(printf "%80s" | tr " " "-") \nYou are inside the VNC container,\n - You do not have access to ROS in this terminal\n - You may docker exec into other containers if that is configured.\n$(printf "%80s" | tr " " "-")\n"' >> /etc/bash.bashrc
 
 EXPOSE 5801
 
