@@ -46,6 +46,9 @@ jobs:
           username: ${{ secrets.LCAS_REGISTRY_PUSHER }}
           password: ${{ secrets.LCAS_REGISTRY_TOKEN }}
 
+      - name: Pull base image
+        run: docker pull ${{ inputs.base_image }}
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
