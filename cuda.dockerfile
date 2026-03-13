@@ -72,10 +72,8 @@ RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root
   echo 'PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /etc/bash.bashrc && \
   echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
   echo "alias t='tmux'" >> /etc/bash.bashrc && \
-  echo "alias cls='clear'" >> /etc/bash.bashrc && \
-  echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /etc/bash.bashrc && \
-  echo "export CYCLONEDDS_URI=file:///etc/cyclonedds.xml" >> /etc/bash.bashrc
-
+  echo "alias cls='clear'" >> /etc/bash.bashrc
+  
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV CYCLONEDDS_URI=file:///etc/cyclonedds.xml
 ENV TVNC_VGL=1
