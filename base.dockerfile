@@ -34,10 +34,9 @@ ARG USERNAME=ros
 ARG USER_UID=1001
 ARG USER_GID=$USER_UID
 
-# Create a non-root user
+# Create a non-root user and add sudo support for the non-root user
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    # Add sudo support for the non-root user
     && apt-get update \
     && apt-get install -y --no-install-recommends sudo \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
@@ -53,7 +52,8 @@ RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root
     echo 'PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /etc/bash.bashrc && \
     echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
     echo "alias t='tmux'" >> /etc/bash.bashrc && \
-    echo "alias cls='clear'" >> /etc/bash.bashrc
+    echo "alias cls='clear'" >> /etc/bash.bashrc && \
+    chown ${USERNAME}:${USER_GID} /home/${USERNAME}/.bashrc
 
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV CYCLONEDDS_URI=file:///etc/cyclonedds.xml
