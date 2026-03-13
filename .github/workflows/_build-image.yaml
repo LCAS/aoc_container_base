@@ -79,9 +79,8 @@ jobs:
           file: ./${{ inputs.dockerfile }}
           platforms: ${{ inputs.architectures }}
           push: true
-          no-cache: true
-          # cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.ros_distro }}
-          # cache-to:   type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.ros_distro }},mode=max
+          cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.ros_distro }}
+          cache-to:   type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.ros_distro }},mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
