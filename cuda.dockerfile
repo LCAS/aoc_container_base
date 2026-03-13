@@ -11,26 +11,25 @@ ENV ROS_DISTRO=${ROS_DISTRO}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install language
-RUN apt-get update ; \
-  apt-get upgrade -y && \
-  apt-get install -y --no-install-recommends \
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y --no-install-recommends \
   locales \
   curl \
+  wget \
+  ca-certificates \
   gnupg2 \
   lsb-release \
   git \
   nano \
   python3-setuptools \
   software-properties-common \
-  wget \
   tzdata \
   && locale-gen en_US.UTF-8 \
   && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
   && rm -rf /var/lib/apt/lists/*
-ENV LANG=en_US.UTF-8
 
-RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+ENV LANG=en_US.UTF-8
 
 # Prepare ROS2
 RUN add-apt-repository universe \
@@ -40,7 +39,11 @@ RUN add-apt-repository universe \
 RUN apt-get update && apt-get install -y --no-install-recommends \
   ros-${ROS_DISTRO}-ros-base \
   python3-rosdep \
+  ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
   && rm -rf /var/lib/apt/lists/*
+
+# Cyclone DDS Config
+COPY cyclonedds.xml /etc/cyclonedds.xml
 
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
 
@@ -65,11 +68,15 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 # Configure bash profile
 RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
+  echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /home/${USERNAME}/.bashrc && \
+  chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.bashrc && \
   echo 'PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /etc/bash.bashrc && \
   echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
   echo "alias t='tmux'" >> /etc/bash.bashrc && \
   echo "alias cls='clear'" >> /etc/bash.bashrc
-
+  
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV CYCLONEDDS_URI=file:///etc/cyclonedds.xml
 ENV TVNC_VGL=1
 ENV VGL_ISACTIVE=1
 ENV VGL_FPS=25
@@ -80,5 +87,6 @@ ENV VGL_PROBEGLX=0
 ENV LD_PRELOAD=/usr/lib/libdlfaker.so:/usr/lib/libvglfaker.so
 ENV SHELL=/bin/bash
 
-CMD ["bash", "-l"]
+USER ${USERNAME}
 
+CMD ["bash", "-l"]
