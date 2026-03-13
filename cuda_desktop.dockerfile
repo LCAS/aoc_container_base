@@ -1,4 +1,4 @@
-ARG BASE_IMAGE
+ARG BASE_IMAGE=lcas.lincoln.ac.uk/ros_cuda:humble-main
 
 ###########################################
 FROM ${BASE_IMAGE} AS base

@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=nvidia/cuda:11.8.0-devel-ubuntu22.04
+ARG BASE_IMAGE=nvidia/cuda:11.8.0-runtime-ubuntu22.04
 ARG ROS_DISTRO=humble
 
 ###########################################
