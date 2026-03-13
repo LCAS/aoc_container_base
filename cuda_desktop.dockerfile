@@ -5,4 +5,4 @@ FROM ${BASE_IMAGE} AS base
 
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-desktop \
-    && rm -rf /var/lib/apt/lists/*
+    && sudo rm -rf /var/lib/apt/lists/*
