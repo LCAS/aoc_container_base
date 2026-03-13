@@ -43,7 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 # Cyclone DDS Config
-COPY cyclonedds.xml /etc/cyclonedds.xml 
+COPY cyclonedds.xml /etc/cyclonedds.xml
 
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
 
@@ -73,9 +73,11 @@ RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root
   echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
   echo "alias t='tmux'" >> /etc/bash.bashrc && \
   echo "alias cls='clear'" >> /etc/bash.bashrc && \
-  echo "RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /etc/bash.bashrc && \
-  echo "CYCLONEDDS_URI=file:///etc/cyclonedds.xml" >> /etc/bash.bashrc
+  echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> /etc/bash.bashrc && \
+  echo "export CYCLONEDDS_URI=file:///etc/cyclonedds.xml" >> /etc/bash.bashrc
 
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV CYCLONEDDS_URI=file:///etc/cyclonedds.xml
 ENV TVNC_VGL=1
 ENV VGL_ISACTIVE=1
 ENV VGL_FPS=25

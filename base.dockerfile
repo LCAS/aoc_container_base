@@ -24,8 +24,7 @@ RUN apt-get update \
     ros-${ROS_DISTRO}-ros-base \
     ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
     python3-colcon-common-extensions && \
-    rm -rf /var/lib/apt/lists/* \
-    && rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
 
 ENV LANG=en_US.UTF-8
 
@@ -46,7 +45,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && rm -rf /var/lib/apt/lists/*
 
 # Cyclone DDS Config
-COPY cyclonedds.xml /etc/cyclonedds.xml 
+COPY cyclonedds.xml /etc/cyclonedds.xml
 
 # Configure bash profile
 RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
