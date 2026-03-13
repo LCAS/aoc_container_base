@@ -42,7 +42,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Create non-root user
 RUN useradd -m -s /bin/bash -G video,sudo ${username} && \
-    echo "${username} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    echo "${username} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${username} && \
+    chmod 0440 /etc/sudoers.d/${username}
 
 # Fix /tmp/.X11-unix permissions
 RUN mkdir -p /tmp/.X11-unix && \
@@ -61,6 +62,9 @@ RUN cat <<EOF > /usr/share/glvnd/egl_vendor.d/10_nvidia.json
     }
 }
 EOF
+
+# Install Python 3 for noVNC/websockify
+RUN apt-get update && apt-get install -y python3 && rm -rf /var/lib/apt/lists/*
 
 # Install TurboVNC
 RUN wget -q -O- https://packagecloud.io/dcommander/turbovnc/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/TurboVNC.gpg && \
@@ -99,7 +103,7 @@ ENTRYPOINT [ "/entrypoint.sh" ]
 COPY ./wallpapers/*.jpg /usr/share/backgrounds/xfce/
 
 # Allow other containers to share windows into this display
-RUN echo 'xhost +local: 2>/dev/null' >> ~/.bashrc && \
+RUN echo 'xhost +local: 2>/dev/null' >> /etc/bash.bashrc && \
     echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
     echo "alias cls='clear'" >> /etc/bash.bashrc && \
     echo 'echo -e "$(printf "%80s" | tr " " "-") \nYou are inside the VNC container,\n - You do not have access to ROS in this terminal\n - You may docker exec into other containers if that is configured.\n$(printf "%80s" | tr " " "-")\n"' >> /etc/bash.bashrc

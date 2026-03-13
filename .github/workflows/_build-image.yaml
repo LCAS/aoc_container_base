@@ -52,7 +52,7 @@ jobs:
         with:
           flavor: latest=false
           labels: |
-            org.opencontainers.image.description=AOC Docker Image (${{ inputs.push_image }}
+            org.opencontainers.image.description=AOC Docker Image (${{ inputs.push_image }})
             org.opencontainers.image.authors=L-CAS Team
           images: lcas.lincoln.ac.uk/${{ inputs.push_image }}
           tags: |
