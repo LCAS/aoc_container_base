@@ -12,35 +12,35 @@ ENV ROS_DISTRO=${ROS_DISTRO}
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
-  && apt-get upgrade -y \
-  && apt-get install -y --no-install-recommends \
-  locales \
-  curl \
-  wget \
-  ca-certificates \
-  gnupg2 \
-  lsb-release \
-  git \
-  nano \
-  python3-setuptools \
-  software-properties-common \
-  tzdata \
-  && locale-gen en_US.UTF-8 \
-  && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
-  && rm -rf /var/lib/apt/lists/*
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends \
+        locales \
+        curl \
+        wget \
+        ca-certificates \
+        gnupg2 \
+        lsb-release \
+        git \
+        nano \
+        python3-setuptools \
+        software-properties-common \
+        tzdata \
+    && locale-gen en_US.UTF-8 \
+    && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV LANG=en_US.UTF-8
 
 # Prepare ROS2
 RUN add-apt-repository universe \
-  && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg \
-  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
+    && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list >/dev/null
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  ros-${ROS_DISTRO}-ros-base \
-  python3-rosdep \
-  ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
-  && rm -rf /var/lib/apt/lists/*
+    ros-${ROS_DISTRO}-ros-base \
+    python3-rosdep \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    && rm -rf /var/lib/apt/lists/*
 
 # Cyclone DDS Config
 COPY cyclonedds.xml /etc/cyclonedds.xml
@@ -48,9 +48,9 @@ COPY cyclonedds.xml /etc/cyclonedds.xml
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep init && rosdep update
 
 # Setup VirtualGL
-RUN wget -q -O- https://packagecloud.io/dcommander/virtualgl/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/VirtualGL.gpg && \
-  echo "deb [signed-by=/etc/apt/trusted.gpg.d/VirtualGL.gpg] https://packagecloud.io/dcommander/virtualgl/any/ any main" >> /etc/apt/sources.list.d/virtualgl.list && \
-  apt update && apt install -y virtualgl libgl1 && rm -rf /var/lib/apt/lists/*
+RUN wget -q -O- https://packagecloud.io/dcommander/virtualgl/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/VirtualGL.gpg \
+    && echo "deb [signed-by=/etc/apt/trusted.gpg.d/VirtualGL.gpg] https://packagecloud.io/dcommander/virtualgl/any/ any main" >>/etc/apt/sources.list.d/virtualgl.list \
+    && apt-get update && apt-get install -y virtualgl libgl1 && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
 ARG USERNAME=ros
@@ -58,13 +58,12 @@ ARG USER_UID=1001
 ARG USER_GID=$USER_UID
 
 RUN groupadd --gid $USER_GID $USERNAME \
-  && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
-  # Add sudo support for the non-root user\
-  && apt-get update \
-  && apt-get install -y --no-install-recommends sudo \
-  && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
-  && chmod 0440 /etc/sudoers.d/$USERNAME \
-  && rm -rf /var/lib/apt/lists/*
+    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    # Add sudo support for the non-root user\
+    && apt-get update \
+    && apt-get install -y --no-install-recommends sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL >/etc/sudoers.d/$USERNAME && chmod 0440 /etc/sudoers.d/$USERNAME \
+    && rm -rf /var/lib/apt/lists/*
 
 # Configure bash profile
 RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
@@ -74,7 +73,7 @@ RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root
   echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
   echo "alias t='tmux'" >> /etc/bash.bashrc && \
   echo "alias cls='clear'" >> /etc/bash.bashrc
-  
+
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV CYCLONEDDS_URI=file:///etc/cyclonedds.xml
 ENV TVNC_VGL=1
