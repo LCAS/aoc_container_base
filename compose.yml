@@ -1,0 +1,54 @@
+# Docker Compose illustrating a VNC desktop container alongside a ROS container.
+# The ROS container renders GUI applications (e.g. RViz) through the VNC desktop
+# by sharing the X11 socket. Both services are on the same bridge network so
+# CycloneDDS peer discovery works out of the box.
+#
+# Usage:
+#   No GPU:      docker compose up
+#   With GPU:    docker compose -f compose.yml -f compose.gpu.yml up
+#
+# Access the desktop at: http://localhost:5801/vnc.html?autoconnect=true
+
+services:
+
+  # ── VNC Desktop ──────────────────────────────────────────────────────────────
+  vnc:
+    build:
+      context: ./docker           # contains vnc-entrypoint.sh
+      dockerfile: ../vnc.dockerfile
+      target: xfce
+    ports:
+      - "5801"               # noVNC web interface
+    volumes:
+      - x11:/tmp/.X11-unix        # share X server socket with other containers
+    networks:
+      - ros_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5801/vnc.html"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── ROS Container ────────────────────────────────────────────────────────────
+  ros:
+    build:
+      context: ./docker           # contains cyclonedds.xml
+      dockerfile: ../cuda.dockerfile
+    depends_on:
+      vnc:
+        condition: service_healthy  # wait for VNC desktop to be ready before starting ROS
+    environment:
+      DISPLAY: ":1"               # connect to the VNC X server
+    volumes:
+      - x11:/tmp/.X11-unix        # X11 socket shared from VNC container
+    networks:
+      - ros_net
+    command: ["sleep", "infinity"]
+
+# ── Shared resources ───────────────────────────────────────────────────────────
+volumes:
+  x11:                            # ephemeral volume for the X11 unix socket
+
+networks:
+  ros_net:
+    driver: bridge                # CycloneDDS multicast works within a bridge network

@@ -124,3 +124,5 @@ ENV VGL_WM=1
 ENV VGL_PROBEGLX=0
 ENV LD_PRELOAD=/usr/lib/libdlfaker.so:/usr/lib/libvglfaker.so
 ENV SHELL=/bin/bash
+
+CMD ["sleep", "infinity"]
