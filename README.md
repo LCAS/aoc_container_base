@@ -1,8 +1,8 @@
-# LCAS/aoc_container_base
+# AOC Container Base 
 
-A repository of verstile Docker containers, orginally developed as apart of the [Agri-OpenCore (AOC) project](https://agri-opencore.org) stack.
+A repository of verstile Docker containers, orginally developed as apart of the [Agri-OpenCore (AOC) project](https://agri-opencore.org). Designed for the execution of simple and reliable containerised robotics solutions.
 
-This repository provides us with the following containers:
+This repository manages the following containers:
 
 | Container Name | Varients | Purpose | File |
 | --- | --- | --- | --- |
@@ -15,24 +15,23 @@ This repository provides us with the following containers:
 These containers are built from three standard container images, `ros`, `nvidia/cuda` and `debian`. Each container is either built from one of these pre-existing images or one derrived from it in this pattern.
 
 ```mermaid
+%%{init: {"theme":"neutral"}}%%
 flowchart TB
-    library/ros["library/ros"] --> lcas/ros["lcas/ros"]
-    nvidia/cuda["nvidia/cuda"] --> lcas/ros_cuda["lcas/ros_cuda"]
-    lcas/ros_cuda --> lcas/ros_cuda_desktop["lcas/ros_cuda_desktop"]
+    library_ros["library/ros"] --> lcas_ros["lcas/ros"]
+    nvidia_cuda["nvidia/cuda"] --> lcas_ros_cuda["lcas/ros_cuda"]
+    lcas_ros_cuda --> lcas_ros_cuda_desktop["lcas/ros_cuda_desktop"]
     debian["debian"] --> vnc["vnc"]
     vnc --> vnc_devtools["vnc_devtools"]
 
-    style library/ros stroke-width:1px,stroke-dasharray: 1,fill:#ffffff
-    style lcas/ros fill:#BBDEFB
-    style nvidia/cuda stroke-width:1px,stroke-dasharray: 1,fill:#ffffff
-    style lcas/ros_cuda fill:#BBDEFB
-    style lcas/ros_cuda_desktop fill:#BBDEFB
-    style debian stroke-width:1px,stroke-dasharray: 1,fill:#ffffff
-    style vnc fill:#BBDEFB
-    style vnc_devtools fill:#BBDEFB
+    %% External base images (dashed)
+    style library_ros stroke-width:1px,stroke-dasharray: 3 3
+    style nvidia_cuda stroke-width:1px,stroke-dasharray: 3 3
+    style debian stroke-width:1px,stroke-dasharray: 3 3
 ```
 
 ## How can I use this?
+
+### Development
 
 This works best if you follow the [`ros2_workspace_template`](https://github.com/lcas/ros2_pkg_template), use this as a template to build your own repositories, that contain the packages you want to ship.
 
@@ -63,5 +62,11 @@ flowchart LR
   classDef loop fill:transparent,stroke:#999,stroke-width:1px;
   class Iter loop;
 ```
+
+### Deployment
+
+The general concept is that we take the `vnc` container image and deploy that only once[^vnc-plural], allowing to remove the bulk of having all the tools for a display inside every container.
+
+[^vnc-plural]: We may want to deploy this multiple times, i.e. to support multiple displays for monitoring, but this is a-typical. But either way we are deploying as few displays as possible meaning we have less resource requirements.
 
 #
