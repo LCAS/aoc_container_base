@@ -31,7 +31,7 @@ flowchart TB
 
 ## How can I use this?
 
-### Development
+### ROS
 
 This works best if you follow the [`ros2_workspace_template`](https://github.com/lcas/ros2_pkg_template), use this as a template to build your own repositories, that contain the packages you want to ship.
 
@@ -63,7 +63,9 @@ flowchart LR
   class Iter loop;
 ```
 
-### Deployment
+### VNC
+
+One of the components `vnc` is a X11 destination allowing for graphical applications to be displayed in a web browser, either on the robot or remotely.
 
 The general concept is that we take the `vnc` container image and deploy that only once[^vnc-plural], allowing to remove the bulk of having all the tools for a display inside every container.
 
