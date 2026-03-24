@@ -33,7 +33,7 @@ services:
   ros:
     build:
       context: ./docker           # contains cyclonedds.xml
-      dockerfile: ../cuda.dockerfile
+      dockerfile: ../base.dockerfile
     depends_on:
       vnc:
         condition: service_healthy  # wait for VNC desktop to be ready before starting ROS
