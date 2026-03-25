@@ -13,18 +13,18 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
-        build-essential \
-        ca-certificates \
-        gnupg \
-        cmake \
-        git \
-        curl \
-        wget \
-        unzip \
-        nano \
-        ros-${ROS_DISTRO}-ros-base \
-        ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
-        python3-colcon-common-extensions \
+    build-essential \
+    ca-certificates \
+    gnupg \
+    cmake \
+    git \
+    curl \
+    wget \
+    unzip \
+    nano \
+    ros-${ROS_DISTRO}-ros-base \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LANG=en_US.UTF-8
@@ -35,6 +35,9 @@ RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep update --rosdistro ${ROS_DISTRO}
 RUN wget -q -O- https://packagecloud.io/dcommander/virtualgl/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/VirtualGL.gpg \
     && echo "deb [signed-by=/etc/apt/trusted.gpg.d/VirtualGL.gpg] https://packagecloud.io/dcommander/virtualgl/any/ any main" >>/etc/apt/sources.list.d/virtualgl.list \
     && apt-get update && apt-get install -y virtualgl libgl1 && rm -rf /var/lib/apt/lists/*
+
+# Fix GLVND NVIDIA EGL registration
+COPY nvidia-egl-vendor.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
 
 # Configure bash profile
 RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
@@ -49,7 +52,7 @@ ENV VGL_COMPRESS=0
 ENV VGL_DISPLAY=egl
 ENV VGL_WM=1
 ENV VGL_PROBEGLX=0
-ENV LD_PRELOAD=/usr/lib/libdlfaker.so:/usr/lib/libvglfaker.so
+ENV LD_PRELOAD=libdlfaker.so:libvglfaker.so
 ENV SHELL=/bin/bash
 
 CMD ["bash", "-l"]
