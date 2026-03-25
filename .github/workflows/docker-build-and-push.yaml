@@ -60,16 +60,6 @@ jobs:
     secrets: inherit
 
   # ── Level 1: base_image is the exact digest from level 0 ─────────────────
-  vnc-devtools:
-    needs: vnc
-    uses: ./.github/workflows/_build-image.yaml
-    with:
-      base_image:    lcas.lincoln.ac.uk/vnc@${{ needs.vnc.outputs.digest }}
-      push_image:    vnc_devtools
-      dockerfile:    vnc_devtools.dockerfile
-      architectures: linux/amd64,linux/arm64
-    secrets: inherit
-
   ros-cuda-desktop-humble:
     needs: ros-cuda-humble
     uses: ./.github/workflows/_build-ros-image.yaml

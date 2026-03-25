@@ -6,6 +6,8 @@
 services:
 
   vnc:
+    devices:
+        - /dev/dri:/dev/dri    # passes all card* and renderD* nodes
     deploy:
       resources:
         reservations:
@@ -15,6 +17,8 @@ services:
               capabilities: [gpu, utility, video, graphics]
 
   ros:
+    devices:
+        - /dev/dri:/dev/dri    # passes all card* and renderD* nodes
     deploy:
       resources:
         reservations:

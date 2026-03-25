@@ -21,6 +21,7 @@ RUN apt-get update \
         curl \
         wget \
         unzip \
+        nano \
         ros-${ROS_DISTRO}-ros-base \
         ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
         python3-colcon-common-extensions \
@@ -28,32 +29,27 @@ RUN apt-get update \
 
 ENV LANG=en_US.UTF-8
 
-RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep update
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh && rosdep update --rosdistro ${ROS_DISTRO}
 
-ARG USERNAME=ros
-ARG USER_UID=1001
-ARG USER_GID=$USER_UID
-
-# Create a non-root user and add sudo support for the non-root user
-RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends sudo \
-    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL >/etc/sudoers.d/$USERNAME && chmod 0440 /etc/sudoers.d/$USERNAME \
-    && rm -rf /var/lib/apt/lists/*
-
-# Cyclone DDS Config
-COPY cyclonedds.xml /etc/cyclonedds.xml
+# Setup VirtualGL
+RUN wget -q -O- https://packagecloud.io/dcommander/virtualgl/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/VirtualGL.gpg \
+    && echo "deb [signed-by=/etc/apt/trusted.gpg.d/VirtualGL.gpg] https://packagecloud.io/dcommander/virtualgl/any/ any main" >>/etc/apt/sources.list.d/virtualgl.list \
+    && apt-get update && apt-get install -y virtualgl libgl1 && rm -rf /var/lib/apt/lists/*
 
 # Configure bash profile
 RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
-    echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /home/${USERNAME}/.bashrc && \
     echo 'PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /etc/bash.bashrc && \
-    echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
-    chown ${USERNAME}:${USER_GID} /home/${USERNAME}/.bashrc
+    echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc
 
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-ENV CYCLONEDDS_URI=file:///etc/cyclonedds.xml
+ENV TVNC_VGL=1
+ENV VGL_ISACTIVE=1
+ENV VGL_FPS=25
+ENV VGL_COMPRESS=0
+ENV VGL_DISPLAY=egl
+ENV VGL_WM=1
+ENV VGL_PROBEGLX=0
+ENV LD_PRELOAD=/usr/lib/libdlfaker.so:/usr/lib/libvglfaker.so
+ENV SHELL=/bin/bash
 
-USER ${USERNAME}
 CMD ["bash", "-l"]
