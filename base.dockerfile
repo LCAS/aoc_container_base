@@ -13,18 +13,18 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
-    build-essential \
-    ca-certificates \
-    gnupg \
-    cmake \
-    git \
-    curl \
-    wget \
-    unzip \
-    nano \
-    ros-${ROS_DISTRO}-ros-base \
-    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
-    python3-colcon-common-extensions \
+        build-essential \
+        ca-certificates \
+        gnupg \
+        cmake \
+        git \
+        curl \
+        wget \
+        unzip \
+        nano \
+        ros-${ROS_DISTRO}-ros-base \
+        ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+        python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LANG=en_US.UTF-8

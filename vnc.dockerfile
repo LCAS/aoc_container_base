@@ -48,20 +48,6 @@ RUN useradd -m -s /bin/bash -G video,sudo ${username} \
 RUN mkdir -p /tmp/.X11-unix \
     && chmod 1777 /tmp/.X11-unix
 
-# Install VirtualGL
-RUN wget -q -O- https://packagecloud.io/dcommander/virtualgl/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/VirtualGL.gpg \
-    && echo "deb [signed-by=/etc/apt/trusted.gpg.d/VirtualGL.gpg] https://packagecloud.io/dcommander/virtualgl/any/ any main" >>/etc/apt/sources.list.d/virtualgl.list \
-    && apt-get update && apt-get install -y virtualgl libgl1 && rm -rf /var/lib/apt/lists/*
-
-COPY <<EOF /usr/share/glvnd/egl_vendor.d/10_nvidia.json
-{
-    "file_format_version": "1.0.0",
-    "ICD": {
-        "library_path": "libEGL_nvidia.so.0"
-    }
-}
-EOF
-
 # Install Python 3 for noVNC/websockify
 RUN apt-get update && apt-get install -y python3 && rm -rf /var/lib/apt/lists/*
 
@@ -116,13 +102,6 @@ RUN mkdir -p ${HOME}/.local/bin
 
 ENV DISPLAY=:1
 ENV TVNC_VGL=1
-ENV VGL_ISACTIVE=1
-ENV VGL_FPS=25
-ENV VGL_COMPRESS=0
-ENV VGL_DISPLAY=egl
-ENV VGL_WM=1
-ENV VGL_PROBEGLX=0
-ENV LD_PRELOAD=/usr/lib/libdlfaker.so:/usr/lib/libvglfaker.so
 ENV SHELL=/bin/bash
 
 CMD ["sleep", "infinity"]

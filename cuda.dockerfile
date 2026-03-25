@@ -49,10 +49,13 @@ RUN wget -q -O- https://packagecloud.io/dcommander/virtualgl/gpgkey | gpg --dear
     && echo "deb [signed-by=/etc/apt/trusted.gpg.d/VirtualGL.gpg] https://packagecloud.io/dcommander/virtualgl/any/ any main" >>/etc/apt/sources.list.d/virtualgl.list \
     && apt-get update && apt-get install -y virtualgl libgl1 && rm -rf /var/lib/apt/lists/*
 
+# Fix GLVND NVIDIA EGL registration
+COPY nvidia-egl-vendor.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+
 # Configure bash profile
 RUN echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
-  echo 'PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /etc/bash.bashrc && \
-  echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc
+    echo 'PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /etc/bash.bashrc && \
+    echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc
 
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV TVNC_VGL=1
@@ -62,7 +65,7 @@ ENV VGL_COMPRESS=0
 ENV VGL_DISPLAY=egl
 ENV VGL_WM=1
 ENV VGL_PROBEGLX=0
-ENV LD_PRELOAD=/usr/lib/libdlfaker.so:/usr/lib/libvglfaker.so
+ENV LD_PRELOAD=libdlfaker.so:libvglfaker.so
 ENV SHELL=/bin/bash
 
 CMD ["bash", "-l"]
