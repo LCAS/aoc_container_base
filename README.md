@@ -10,7 +10,6 @@ This repository manages the following containers:
 | `lcas.lincoln.ac.uk/ros_cuda` | `humble` `jazzy` | ROS + Nvidia. When you need to use a GPU in your ROS environment for either better quality simulation or AI workloads. | [cuda.dockerfile](cuda.dockerfile) |
 | `lcas.lincoln.ac.uk/ros_cuda_desktop` | `humble` `jazzy` | ROS + Nvidia + Packages. Installs the `ros-{distro}-desktop` varient so there is the full ROS stack available. | [cuda_desktop.dockerfile](cuda_desktop.dockerfile) |
 | `lcas.lincoln.ac.uk/vnc` | `latest` | Standalone VNC container that can take X11 visualisations and show them in a browser. | [vnc.dockerfile](vnc.dockerfile) |
-| `lcas.lincoln.ac.uk/vnc_devtools` | `latest` | Adds development tools such as a terminal for the standard VNC environment. | [vnc_devtools.dockerfile](vnc_devtools.dockerfile) |
 
 These containers are built from three standard container images, `ros`, `nvidia/cuda` and `debian`. Each container is either built from one of these pre-existing images or one derrived from it in this pattern.
 
@@ -72,3 +71,5 @@ The general concept is that we take the `vnc` container image and deploy that on
 [^vnc-plural]: We may want to deploy this multiple times, i.e. to support multiple displays for monitoring, but this is a-typical. But either way we are deploying as few displays as possible meaning we have less resource requirements.
 
 #
+
+Lincoln Centre for Autonomous Systems Research 
