@@ -18,11 +18,12 @@ services:
       dockerfile: ../vnc.dockerfile
       target: xfce
     ports:
-      - "5801"               # noVNC web interface
+      - "5801"                    # noVNC web interface
     volumes:
       - x11:/tmp/.X11-unix        # share X server socket with other containers
     networks:
       - ros_net
+    ipc: shareable                # Allow other containers to access the IPC of the VNC container to allow data to go into it's X11
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5801/vnc.html"]
       interval: 10s
@@ -32,15 +33,16 @@ services:
   # ── ROS Container ────────────────────────────────────────────────────────────
   ros:
     build:
-      context: ./docker           # contains cyclonedds.xml
+      context: ./docker             # contains cyclonedds.xml
       dockerfile: ../base.dockerfile
     depends_on:
       vnc:
         condition: service_healthy  # wait for VNC desktop to be ready before starting ROS
     environment:
-      DISPLAY: ":1"               # connect to the VNC X server
+      DISPLAY: ":1"                 # connect to the VNC X server
     volumes:
-      - x11:/tmp/.X11-unix        # X11 socket shared from VNC container
+      - x11:/tmp/.X11-unix          # X11 socket shared from VNC container
+    ipc: "service:vnc"              # Use the IPC of the VNC container to allow access to X11 socket reliably 
     networks:
       - ros_net
     command: ["sleep", "infinity"]
