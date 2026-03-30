@@ -37,6 +37,7 @@ jobs:
 
   #################################################################################################
   build_standalone:
+    name: Build ${{ matrix.push_image }}
     needs: prepare
     strategy:
       matrix:
@@ -47,7 +48,7 @@ jobs:
             dockerfile: "vnc.dockerfile"
             architectures: "linux/amd64,linux/arm64"
 
-    uses: ./.github/workflows/_build-image.yaml
+    uses: ./.github/workflows/_build-standalone-image.yaml
     with:
       base_image: ${{ matrix.base_image }}
       push_image: ${{ matrix.push_image }}
@@ -57,6 +58,7 @@ jobs:
     
 
   build_ros:
+    name: Build ${{ matrix.push_image }} ${{ matrix.tag_stem }}
     needs: prepare
     strategy:
       max-parallel: 8
