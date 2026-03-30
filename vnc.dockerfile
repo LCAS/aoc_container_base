@@ -6,9 +6,7 @@ ARG username=lcas
 ENV BASE_IMAGE=${BASE_IMAGE}
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    DISPLAY=:1 \
-    NOVNC_PORT=5801 \
-    RESOLUTION=1366x768x24
+    DISPLAY=:1
 
 # Install timezone
 RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime \

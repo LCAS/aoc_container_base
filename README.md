@@ -1,6 +1,6 @@
 # AOC Container Base 
 
-A repository of verstile Docker containers, orginally developed as apart of the [Agri-OpenCore (AOC) project](https://agri-opencore.org). Designed for the execution of simple and reliable containerised robotics solutions.
+A repository of versatile Docker containers, orginally developed as apart of the [Agri-OpenCore (AOC) project](https://agri-opencore.org). Designed for the execution of simple and reliable containerised robotics solutions.
 
 This repository manages the following containers:
 
@@ -8,7 +8,7 @@ This repository manages the following containers:
 | --- | --- | --- | --- |
 | `lcas.lincoln.ac.uk/ros` | `humble` `jazzy` | Base ROS Container, the minimal environment you need for ROS | [base.dockerfile](base.dockerfile) |
 | `lcas.lincoln.ac.uk/ros_cuda` | `humble` `jazzy` | ROS + Nvidia. When you need to use a GPU in your ROS environment for either better quality simulation or AI workloads. | [cuda.dockerfile](cuda.dockerfile) |
-| `lcas.lincoln.ac.uk/ros_cuda_desktop` | `humble` `jazzy` | ROS + Nvidia + Packages. Installs the `ros-{distro}-desktop` varient so there is the full ROS stack available. | [cuda_desktop.dockerfile](cuda_desktop.dockerfile) |
+| `lcas.lincoln.ac.uk/ros_cuda_desktop` | `humble` `jazzy` | ROS + Nvidia + Packages. Installs the `ros-{distro}-desktop` varient so there is the full ROS stack available. | [desktop.dockerfile](desktop.dockerfile) |
 | `lcas.lincoln.ac.uk/vnc` | `latest` | Standalone VNC container that can take X11 visualisations and show them in a browser. | [vnc.dockerfile](vnc.dockerfile) |
 
 These containers are built from three standard container images, `ros`, `nvidia/cuda` and `debian`. Each container is either built from one of these pre-existing images or one derrived from it in this pattern.
@@ -20,7 +20,6 @@ flowchart TB
     nvidia_cuda["nvidia/cuda"] --> lcas_ros_cuda["lcas/ros_cuda"]
     lcas_ros_cuda --> lcas_ros_cuda_desktop["lcas/ros_cuda_desktop"]
     debian["debian"] --> vnc["vnc"]
-    vnc --> vnc_devtools["vnc_devtools"]
 
     %% External base images (dashed)
     style library_ros stroke-width:1px,stroke-dasharray: 3 3
