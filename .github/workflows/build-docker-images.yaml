@@ -1,4 +1,4 @@
-name: Build a ROS Container Images
+name: Build AOC Container Images
 
 on:
   push:
@@ -36,11 +36,30 @@ jobs:
           echo "image_context=${IMAGE_CONTEXT}" >> "$GITHUB_OUTPUT"
 
   #################################################################################################
-  
+  build_standalone:
+    needs: prepare
+    strategy:
+      matrix:
+        include:
+          # VNC standalone image
+          - base_image: "debian:trixie-slim"
+            push_image: "vnc"
+            dockerfile: "vnc.dockerfile"
+            architectures: "linux/amd64,linux/arm64"
+
+    uses: ./.github/workflows/_build-image.yaml
+    with:
+      base_image: ${{ matrix.base_image }}
+      push_image: ${{ matrix.push_image }}
+      dockerfile: ${{ matrix.dockerfile }}
+      architectures: ${{ matrix.architectures }}
+    secrets: inherit
+    
+
   build_ros:
     needs: prepare
     strategy:
-      max-parallel: 3
+      max-parallel: 8
       matrix:
         include:
           # ROS Humble
@@ -79,7 +98,7 @@ jobs:
             build_desktop: true
             desktop_push_image: "ros_cuda_desktop"
 
-    uses: ./.github/workflows/_ros_build.yaml
+    uses: ./.github/workflows/_build-ros-image.yaml
     with:
       base_image: ${{ matrix.base_image }}
       push_image: ${{ matrix.push_image }}
@@ -88,6 +107,6 @@ jobs:
       ros_distro: ${{ matrix.ros_distro }}
       dockerfile: ${{ matrix.dockerfile }}
       architectures: ${{ matrix.architectures }}
-      build_desktop: ${{ matrix.build_desktop }}
+      build_desktop: ${{ matrix.build_desktop || false }}
       desktop_push_image: ${{ matrix.desktop_push_image }}
     secrets: inherit
