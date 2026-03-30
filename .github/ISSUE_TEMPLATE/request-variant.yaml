@@ -1,0 +1,75 @@
+name: "Request New Image Variant"
+description: "Request a new variant based on the images scaffolded by this repository (e.g. ROS / CUDA variants)."
+title: "[Variant]: "
+labels:
+  - "enhancement"
+  - "feature request"
+body:
+  - type: textarea
+    id: why
+    attributes:
+      label: "Explain Your Problem"
+      description: "What problem does this solve? Why can't you use an existing image that is produced from this repository?"
+    validations:
+      required: true
+
+  - type: input
+    id: ros_version
+    attributes:
+      label: "ROS 2 Distro"
+      placeholder: "humble"
+
+  - type: dropdown
+    id: rep2001
+    attributes:
+      label: "Is the ROS 2 version a LTS variant?"
+      description: "See [REP-2001](https://www.ros.org/reps/rep-2001.html)"
+      options:
+        - "Yes"
+        - "No"
+
+  - type: input
+    id: ubuntu_version
+    attributes:
+      label: "Ubuntu version"
+      placeholder: "22.04"
+
+  - type: checkboxes
+    id: ubuntu_lts
+    attributes:
+      label: "Is Ubuntu LTS?"
+      options:
+        - label: "Yes (LTS)"
+
+  - type: textarea
+    id: non_lts_justification
+    attributes:
+      label: "If not a Ubuntu LTS, please justify why you need this version."
+
+  - type: checkboxes
+    id: cuda_needed
+    attributes:
+      label: "Is NVIDIA CUDA needed?"
+      description: "CUDA will make the images much larger and should only be used for 'AI' workloads that will take advantage of CUDA"
+      options:
+        - label: "Yes, I need to use CUDA in this container"
+
+  - type: input
+    id: cuda_version
+    attributes:
+      label: "If yes, what CUDA version do you need?"
+      description: "If you are using your own machine, run `nvidia-smi` and see what version you are using or state latest."
+      placeholder: "13.2.0"
+
+  - type: input
+    id: cuda_base_tag
+    attributes:
+      label: "What is your proposed NVIDIA base image to use? (optional)"
+      description: "From [NVIDIA supported tags list](https://gitlab.com/nvidia/container-images/cuda/-/blob/master/doc/supported-tags.md)."
+      placeholder: "13.2.0-cudnn-runtime-ubuntu22.04"
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: "What is your use case?"
+      description: "Provide us with information and links of how you expect to be using this."
