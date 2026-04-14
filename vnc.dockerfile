@@ -35,9 +35,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN useradd -m -s /bin/bash -G video,sudo ${username} \
-    && echo "${username} ALL=(ALL) NOPASSWD:ALL" >/etc/sudoers.d/${username} \
-    && chmod 0440 /etc/sudoers.d/${username}
+RUN useradd -m -s /bin/bash -G video ${username}
 
 # Fix /tmp/.X11-unix permissions
 RUN mkdir -p /tmp/.X11-unix \
