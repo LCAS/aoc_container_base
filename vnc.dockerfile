@@ -22,7 +22,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gnupg2 \
     lsb-release \
-    sudo \
     wget \
     libglvnd0 \
     libgl1 \
@@ -31,16 +30,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxext6 \
     libx11-6 \
     x11-utils \
-    less \
     screen \
     unzip \
-    x11-apps \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN useradd -m -s /bin/bash -G video,sudo ${username} \
-    && echo "${username} ALL=(ALL) NOPASSWD:ALL" >/etc/sudoers.d/${username} \
-    && chmod 0440 /etc/sudoers.d/${username}
+RUN useradd -m -s /bin/bash -G video ${username}
 
 # Fix /tmp/.X11-unix permissions
 RUN mkdir -p /tmp/.X11-unix \
@@ -55,8 +50,8 @@ RUN wget -q -O- https://packagecloud.io/dcommander/turbovnc/gpgkey | gpg --dearm
     && apt-get update && apt-get install -y turbovnc && rm -rf /var/lib/apt/lists/*
 
 # Install noVNC
-ENV NOVNC_VERSION=1.4.0
-ENV WEBSOCKETIFY_VERSION=0.10.0
+ENV NOVNC_VERSION=1.6.0
+ENV WEBSOCKETIFY_VERSION=0.13.0
 RUN mkdir -p /usr/local/novnc \
     && curl -sSL https://github.com/novnc/noVNC/archive/v${NOVNC_VERSION}.zip -o /tmp/novnc-install.zip \
     && unzip /tmp/novnc-install.zip -d /usr/local/novnc \
@@ -87,9 +82,7 @@ COPY ./wallpapers/*.jpg /usr/share/backgrounds/xfce/
 
 # Allow other containers to share windows into this display
 RUN echo 'xhost +local: 2>/dev/null' >> /etc/bash.bashrc && \
-    echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc && \
-    echo "alias cls='clear'" >> /etc/bash.bashrc && \
-    echo '[[ $- == *i* ]] && [[ $$ -ne 1 ]] && echo -e "$(printf "%80s" | tr " " "=") \nYou are inside the VNC container,\n - You do not have access to ROS in this terminal\n - You may docker exec into other containers if that is configured.\n$(printf "%80s" | tr " " "=")\n"' >> /etc/bash.bashrc
+    echo "if [ -f /etc/bash.bashrc ]; then source /etc/bash.bashrc; fi" >> /root/.bashrc
 
 EXPOSE 5801
 
