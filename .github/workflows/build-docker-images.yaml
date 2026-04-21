@@ -91,7 +91,7 @@ jobs:
             desktop_push_image: "ros_cuda_desktop"
 
           # ROS CUDA 12.8 Humble
-          - base_image: "12.8.1-cudnn-devel-ubuntu22.04"
+          - base_image: "nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04"
             push_image: "ros_cuda"
             ros_distro: "humble"
             tag_stem: "humble-12.8"
