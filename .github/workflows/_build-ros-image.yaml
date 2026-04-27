@@ -74,6 +74,7 @@ jobs:
           images: lcas.lincoln.ac.uk/${{ inputs.push_image }}
           tags: |
             type=raw,value=${{ inputs.tag_stem }}-${{ inputs.image_context }}
+            type=raw,enable=${{ inputs.image_context == 'main' }},value=${{ inputs.tag_stem }}-latest
             type=semver,pattern={{version}},prefix=${{ inputs.tag_stem }}-
             type=semver,pattern={{major}}.{{minor}},prefix=${{ inputs.tag_stem }}-
             type=semver,pattern={{major}},prefix=${{ inputs.tag_stem }}-
@@ -110,6 +111,7 @@ jobs:
           images: lcas.lincoln.ac.uk/${{ inputs.desktop_push_image }}
           tags: |
             type=raw,value=${{ inputs.tag_stem }}-${{ inputs.image_context }}
+            type=raw,enable=${{ inputs.image_context == 'main' }},value=${{ inputs.tag_stem }}-latest
             type=semver,pattern={{version}},prefix=${{ inputs.tag_stem }}-
             type=semver,pattern={{major}}.{{minor}},prefix=${{ inputs.tag_stem }}-
             type=semver,pattern={{major}},prefix=${{ inputs.tag_stem }}-
