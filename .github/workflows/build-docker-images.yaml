@@ -80,11 +80,21 @@ jobs:
             dockerfile: "base.dockerfile"
             architectures: "linux/amd64,linux/arm64"
 
-          # ROS CUDA Humble
+          # ROS CUDA 11.8 Humble
           - base_image: "nvidia/cuda:11.8.0-runtime-ubuntu22.04"
             push_image: "ros_cuda"
             ros_distro: "humble"
             tag_stem: "humble-11.8"
+            dockerfile: "cuda.dockerfile"
+            architectures: "linux/amd64"
+            build_desktop: true
+            desktop_push_image: "ros_cuda_desktop"
+
+          # ROS CUDA 12.8 Humble
+          - base_image: "nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04"
+            push_image: "ros_cuda"
+            ros_distro: "humble"
+            tag_stem: "humble-12.8"
             dockerfile: "cuda.dockerfile"
             architectures: "linux/amd64"
             build_desktop: true

@@ -7,8 +7,8 @@ This repository manages the following containers:
 | Image | Tags | Includes | Choose This If... | Dockerfile |
 | --- | --- | --- | --- | --- |
 | `lcas.lincoln.ac.uk/ros` | `humble`, `jazzy` | Minimal ROS runtime and tooling, plus VirtualGL | You need ROS with graphical workflows (including VirtualGL-based rendering) but do not need NVIDIA CUDA | [base.dockerfile](base.dockerfile) |
-| `lcas.lincoln.ac.uk/ros_cuda` | `humble-11.8`, `jazzy-12.9` | ROS plus NVIDIA CUDA support | You need CUDA-enabled GPU acceleration for simulation or AI workloads | [cuda.dockerfile](cuda.dockerfile) |
-| `lcas.lincoln.ac.uk/ros_cuda_desktop` | `humble-11.8`, `jazzy-12.9` | ROS + CUDA + `ros-{distro}-desktop` package set | You need CUDA and the full ROS desktop stack | [desktop.dockerfile](desktop.dockerfile) |
+| `lcas.lincoln.ac.uk/ros_cuda` | `humble-11.8`, `humble-12.8`, `jazzy-12.9` | ROS plus NVIDIA CUDA support | You need CUDA-enabled GPU acceleration for simulation or AI workloads | [cuda.dockerfile](cuda.dockerfile) |
+| `lcas.lincoln.ac.uk/ros_cuda_desktop` | `humble-11.8`, `humble-12.8`, `jazzy-12.9` | ROS + CUDA + `ros-{distro}-desktop` package set | You need CUDA and the full ROS desktop stack | [desktop.dockerfile](desktop.dockerfile) |
 | `lcas.lincoln.ac.uk/vnc` | `latest` | Browser-accessible VNC/X11 display endpoint | You need a shared web-based display target for GUI applications from other containers | [vnc.dockerfile](vnc.dockerfile) |
 
 These containers are built from three standard container images, `ros`, `nvidia/cuda` and `debian`. Each container is either built from one of these pre-existing images or one derived from it in this pattern.
