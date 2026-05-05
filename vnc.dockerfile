@@ -31,11 +31,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libx11-6 \
     x11-utils \
     screen \
+    sudo \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN useradd -m -s /bin/bash -G video ${username}
+RUN useradd -m -s /bin/bash -G video,sudo ${username}
+
+# Allow passwordless sudo for users in sudo group
+RUN echo '%sudo ALL=(ALL:ALL) NOPASSWD:ALL' > /etc/sudoers.d/99-sudo-nopasswd \
+    && chmod 0440 /etc/sudoers.d/99-sudo-nopasswd
 
 # Fix /tmp/.X11-unix permissions
 RUN mkdir -p /tmp/.X11-unix \

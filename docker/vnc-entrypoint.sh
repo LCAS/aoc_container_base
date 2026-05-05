@@ -92,8 +92,7 @@ if ! start_turbovnc; then
             echo "--- End of VNC server log ---" >&2
         fi
         echo "" >&2
-        echo "To recover manually, remove the x11 volume and restart:" >&2
-        echo "  docker compose down -v && docker compose up" >&2
+        echo "To recover manually, remove the x11 volume and restart containers." >&2
         exit 1
     fi
 
