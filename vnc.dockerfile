@@ -77,6 +77,12 @@ COPY vnc-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
+COPY vnc-healthcheck.sh /vnc-healthcheck.sh
+RUN chmod +x /vnc-healthcheck.sh
+# start_period allows the VNC stack time to fully initialize before health checks start counting failures
+HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=5 \
+    CMD ["/vnc-healthcheck.sh"]
+
 # Copy in wallpaper
 COPY ./wallpapers/*.jpg /usr/share/backgrounds/xfce/
 

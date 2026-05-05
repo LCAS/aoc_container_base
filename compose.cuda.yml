@@ -25,9 +25,10 @@ services:
       - ros_net
     ipc: shareable                # Allow other containers to access the IPC of the VNC container to allow data to go into it's X11
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5801/vnc.html"]
+      test: ["CMD", "/vnc-healthcheck.sh"]
       interval: 10s
       timeout: 5s
+      start_period: 60s             # allow the VNC stack time to fully initialize
       retries: 5
 
   # ── ROS Container ────────────────────────────────────────────────────────────
