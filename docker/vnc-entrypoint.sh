@@ -12,36 +12,36 @@ cleanup_x11() {
     local had_stale=false
 
     if [ -e /tmp/.X1-lock ]; then
-        echo "  [x11] Found stale lock file /tmp/.X1-lock — removing..."
+        echo "[x11] Found stale lock file /tmp/.X1-lock — removing..."
         rm -f /tmp/.X1-lock || sudo rm -f /tmp/.X1-lock
         if [ -e /tmp/.X1-lock ]; then
-            echo "  [x11] WARNING: failed to remove /tmp/.X1-lock — x11 volume may be in a corrupt state." >&2
+            echo "[x11] WARNING: failed to remove /tmp/.X1-lock — x11 volume may be in a corrupt state." >&2
         else
-            echo "  [x11] Removed stale lock file."
+            echo "[x11] Removed stale lock file."
             had_stale=true
         fi
     fi
 
     if [ -e /tmp/.X11-unix/X1 ]; then
-        echo "  [x11] Found stale socket /tmp/.X11-unix/X1 — removing..."
+        echo "[x11] Found stale socket /tmp/.X11-unix/X1 — removing..."
         rm -f /tmp/.X11-unix/X1 || sudo rm -f /tmp/.X11-unix/X1
         if [ -e /tmp/.X11-unix/X1 ]; then
-            echo "  [x11] WARNING: failed to remove /tmp/.X11-unix/X1 — x11 volume may be in a corrupt state." >&2
+            echo "[x11] WARNING: failed to remove /tmp/.X11-unix/X1 — x11 volume may be in a corrupt state." >&2
         else
-            echo "  [x11] Removed stale socket."
+            echo "[x11] Removed stale socket."
             had_stale=true
         fi
     fi
 
     if $had_stale; then
-        echo "  [x11] Stale X11 files from previous run cleared successfully."
+        echo "[x11] Stale X11 files from previous run cleared successfully."
     else
-        echo "  [x11] No stale X11 files found."
+        echo "[x11] No stale X11 files found."
     fi
 
     # Ensure the socket directory has the correct sticky-bit permissions
-    if ! chmod 1777 /tmp/.X11-unix 2>/dev/null; then
-        echo "  [x11] ERROR: failed to set permissions on /tmp/.X11-unix; verify the mounted X11 directory is writable and configured with mode 1777." >&2
+    if ! sudo chmod 1777 /tmp/.X11-unix 2>/dev/null; then
+        echo "[x11] ERROR: failed to set permissions on /tmp/.X11-unix; verify the mounted X11 directory is writable and configured with mode 1777." >&2
         return 1
     fi
 }
@@ -75,13 +75,13 @@ start_turbovnc() {
 if ! start_turbovnc; then
     echo "" >&2
     echo "ERROR: TurboVNC failed to start within ${VNC_STARTUP_TIMEOUT}s." >&2
-    echo "  This is often caused by stale files left in the x11 volume from a previous run." >&2
+    echo "This is often caused by stale files left in the x11 volume from a previous run." >&2
     if [ -s /tmp/vnc.log ]; then
         echo "--- VNC server log (/tmp/vnc.log) ---" >&2
         cat /tmp/vnc.log >&2
         echo "--- End of VNC server log ---" >&2
     else
-        echo "  (no VNC log available at /tmp/vnc.log)" >&2
+        echo "(no VNC log available at /tmp/vnc.log)" >&2
     fi
 
     echo "" >&2
@@ -154,8 +154,6 @@ echo "xhost +local: applied to :1"
   xfconf-query -c xfce4-desktop -p "${base}/image-path" -n -t string -s "$WALLPAPER"
   xfconf-query -c xfce4-desktop -p "${base}/last-image" -n -t string -s "$WALLPAPER"
   xfconf-query -c xfce4-desktop -p "${base}/last-single-image" -n -t string -s "$WALLPAPER"
-
-  # xfdesktop --reload
 ) &
 
 echo 
