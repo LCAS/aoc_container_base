@@ -40,11 +40,17 @@ cleanup_x11() {
     fi
 
     # Ensure the socket directory has the correct sticky-bit permissions
-    chmod 1777 /tmp/.X11-unix 2>/dev/null || sudo chmod 1777 /tmp/.X11-unix 2>/dev/null || true
+    if ! chmod 1777 /tmp/.X11-unix 2>/dev/null; then
+        echo "  [x11] ERROR: failed to set permissions on /tmp/.X11-unix; verify the mounted X11 directory is writable and configured with mode 1777." >&2
+        return 1
+    fi
 }
 
 echo "Checking x11 volume state..."
-cleanup_x11
+if ! cleanup_x11; then
+    echo "Startup aborted due to invalid X11 volume permissions." >&2
+    exit 1
+fi
 
 # --- Start TurboVNC ---
 VNC_STARTUP_TIMEOUT=30   # seconds to wait for VNC display to come up
