@@ -80,6 +80,14 @@ jobs:
             dockerfile: "base.dockerfile"
             architectures: "linux/amd64,linux/arm64"
 
+          # ROS Lyrical
+          - base_image: "ros:lyrical"
+            push_image: "ros"
+            ros_distro: "lyrical"
+            tag_stem: "lyrical"
+            dockerfile: "base.dockerfile"
+            architectures: "linux/amd64,linux/arm64"
+
           # ROS CUDA 11.8 Humble
           - base_image: "nvidia/cuda:11.8.0-runtime-ubuntu22.04"
             push_image: "ros_cuda"
