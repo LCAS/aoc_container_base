@@ -39,6 +39,11 @@ on:
         required: false
         default: ""
         type: string
+      no_cache:
+        description: Disable the build cache
+        required: false
+        default: false
+        type: boolean
     outputs:
       digest:
         description: Image digest from the build
@@ -89,8 +94,9 @@ jobs:
           file: ./${{ inputs.dockerfile }}
           platforms: ${{ inputs.architectures }}
           push: true
-          cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.tag_stem }}
-          cache-to: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:${{ inputs.tag_stem }},mode=max
+          no-cache: ${{ inputs.no_cache }}
+          cache-from: ${{ !inputs.no_cache && format('type=registry,ref=lcas.lincoln.ac.uk/cache/{0}:{1}', inputs.push_image, inputs.tag_stem) || '' }}
+          cache-to: ${{ !inputs.no_cache && format('type=registry,ref=lcas.lincoln.ac.uk/cache/{0}:{1},mode=max', inputs.push_image, inputs.tag_stem) || '' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
@@ -125,8 +131,9 @@ jobs:
           file: ./desktop.dockerfile
           platforms: ${{ inputs.architectures }}
           push: true
-          cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.desktop_push_image }}:${{ inputs.tag_stem }}
-          cache-to: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.desktop_push_image }}:${{ inputs.tag_stem }},mode=max
+          no-cache: ${{ inputs.no_cache }}
+          cache-from: ${{ !inputs.no_cache && format('type=registry,ref=lcas.lincoln.ac.uk/cache/{0}:{1}', inputs.desktop_push_image, inputs.tag_stem) || '' }}
+          cache-to: ${{ !inputs.no_cache && format('type=registry,ref=lcas.lincoln.ac.uk/cache/{0}:{1},mode=max', inputs.desktop_push_image, inputs.tag_stem) || '' }}
           tags: ${{ steps.meta_desktop.outputs.tags }}
           labels: ${{ steps.meta_desktop.outputs.labels }}
           build-args: |

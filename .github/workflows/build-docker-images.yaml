@@ -7,6 +7,12 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      no_cache:
+        description: Disable the build cache (no cache-from/cache-to, --no-cache)
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -54,6 +60,7 @@ jobs:
       push_image: ${{ matrix.push_image }}
       dockerfile: ${{ matrix.dockerfile }}
       architectures: ${{ matrix.architectures }}
+      no_cache: ${{ inputs.no_cache || false }}
     secrets: inherit
     
 
@@ -139,4 +146,5 @@ jobs:
       architectures: ${{ matrix.architectures }}
       build_desktop: ${{ matrix.build_desktop || false }}
       desktop_push_image: ${{ matrix.desktop_push_image }}
+      no_cache: ${{ inputs.no_cache || false }}
     secrets: inherit
