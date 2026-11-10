@@ -17,6 +17,11 @@ on:
       architectures:
         required: true
         type: string
+      no_cache:
+        description: Disable the build cache
+        required: false
+        default: false
+        type: boolean
     outputs:
       digest:
         description: Image digest from the build
@@ -71,8 +76,9 @@ jobs:
           file: ./${{ inputs.dockerfile }}
           platforms: ${{ inputs.architectures }}
           push: true
-          cache-from: type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:latest
-          cache-to:   type=registry,ref=lcas.lincoln.ac.uk/cache/${{ inputs.push_image }}:latest,mode=max
+          no-cache: ${{ inputs.no_cache }}
+          cache-from: ${{ !inputs.no_cache && format('type=registry,ref=lcas.lincoln.ac.uk/cache/{0}:latest', inputs.push_image) || '' }}
+          cache-to: ${{ !inputs.no_cache && format('type=registry,ref=lcas.lincoln.ac.uk/cache/{0}:latest,mode=max', inputs.push_image) || '' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
