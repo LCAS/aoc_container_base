@@ -129,7 +129,7 @@ jobs:
           - base_image: "nvidia/cuda:13.5.0-cudnn-devel-ubuntu26.04"
             push_image: "ros_cuda"
             ros_distro: "lyrical"
-            tag_stem: "lyrucal-13.5"
+            tag_stem: "lyrical-13.5"
             dockerfile: "cuda.dockerfile"
             architectures: "linux/amd64"
             build_desktop: true
